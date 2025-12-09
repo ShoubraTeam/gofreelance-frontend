@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,32 +9,38 @@ import { Label } from '@/components/ui/label';
 import { AuthContainer } from '../_components/AuthContainer';
 import { AuthError } from '../_components/AuthError';
 import { AuthFooter } from '../_components/AuthFooter';
+import { useLogin } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
+import { ApiValidationError } from '@/lib/api/client';
 
 export default function LoginPage(): React.ReactElement {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const router = useRouter();
+  const setTokens = useAuthStore((state) => state.setTokens);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const { mutate: login, isPending: isLoading } = useLogin({
+    onSuccess: (response) => {
+      setTokens(response.data.accessToken, response.data.refreshToken);
+      router.push('/dashboard');
+    },
+    onError: (err) => {
+      if (err instanceof ApiValidationError) {
+        const errorMessages = err.validationErrors
+          .map((ve) => ve.message)
+          .join('. ');
+        setError(errorMessages);
+      } else {
+        setError(err.message || 'Invalid email or password. Please try again.');
+      }
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
-
-    try {
-      // TODO: Implement authentication API call
-      console.log('Login attempt:', { email, password });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Handle successful login (redirect, etc.)
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
-      console.error('Login error:', err);
-    } finally {
-      setIsLoading(false);
-    }
+    login({ username: email, password });
   };
 
   return (

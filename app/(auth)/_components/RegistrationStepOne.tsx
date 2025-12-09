@@ -3,11 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RoleSelector } from './RoleSelector';
-
-type UserRole = 'client' | 'freelancer';
+import type { RegistrationFormData, UserRole } from '@/lib/types/registration';
 
 interface RegistrationStepOneProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<RegistrationFormData>;
   selectedRole: UserRole | null;
   onRoleSelect: (role: UserRole) => void;
   isLoading: boolean;
@@ -19,7 +18,6 @@ export function RegistrationStepOne({
   selectedRole,
   onRoleSelect,
   isLoading,
-  onNext,
 }: RegistrationStepOneProps): React.ReactElement {
   return (
     <>

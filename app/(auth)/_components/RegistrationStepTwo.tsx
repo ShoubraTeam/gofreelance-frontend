@@ -1,6 +1,6 @@
 import { UseFormReturn, Controller } from 'react-hook-form';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,24 +26,21 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useCountries } from '@/hooks/useCountries';
+import type { RegistrationFormData } from '@/lib/types/registration';
 
 interface RegistrationStepTwoProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<RegistrationFormData>;
   isLoading: boolean;
   onBack: () => void;
 }
 
-const countries = [
-  { value: 'US', label: 'United States' },
-  { value: 'UK', label: 'United Kingdom' },
-  { value: 'CA', label: 'Canada' },
-];
-
-const timezones = [
-  { value: 'America/New_York', label: 'America/New_York (EST)' },
-  { value: 'America/Los_Angeles', label: 'America/Los_Angeles (PST)' },
-  { value: 'Europe/London', label: 'Europe/London (GMT)' },
-];
+const capitalizeCountry = (country: string): string => {
+  return country
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
 
 export function RegistrationStepTwo({
   form,
@@ -52,6 +49,27 @@ export function RegistrationStepTwo({
 }: RegistrationStepTwoProps): React.ReactElement {
   const [countryOpen, setCountryOpen] = useState(false);
   const [timezoneOpen, setTimezoneOpen] = useState(false);
+  const { data: countriesData, isLoading: isLoadingCountries } = useCountries();
+
+  const selectedCountry = form.watch('country');
+
+  const countries = useMemo(() => {
+    if (!countriesData?.data) return [];
+    return Object.keys(countriesData.data).map((country) => ({
+      value: country.toLowerCase(),
+      label: capitalizeCountry(country),
+    }));
+  }, [countriesData]);
+
+  const timezones = useMemo(() => {
+    if (!countriesData?.data || !selectedCountry) return [];
+    const countryTimezones =
+      countriesData.data[selectedCountry.toLowerCase()] || [];
+    return countryTimezones.map((tz) => ({
+      value: tz,
+      label: tz,
+    }));
+  }, [countriesData, selectedCountry]);
 
   return (
     <>
@@ -65,7 +83,9 @@ export function RegistrationStepTwo({
           {...form.register('phoneNumber')}
         />
         {form.formState.errors.phoneNumber && (
-          <p className="text-xs text-red-500">{form.formState.errors.phoneNumber.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.phoneNumber.message}
+          </p>
         )}
       </div>
 
@@ -75,21 +95,25 @@ export function RegistrationStepTwo({
           name="gender"
           control={form.control}
           render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value}
+              disabled={isLoading}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-                <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                <SelectItem value="MALE">Male</SelectItem>
+                <SelectItem value="FEMALE">Female</SelectItem>
               </SelectContent>
             </Select>
           )}
         />
         {form.formState.errors.gender && (
-          <p className="text-xs text-red-500">{form.formState.errors.gender.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.gender.message}
+          </p>
         )}
       </div>
 
@@ -102,7 +126,9 @@ export function RegistrationStepTwo({
           {...form.register('birthDate')}
         />
         {form.formState.errors.birthDate && (
-          <p className="text-xs text-red-500">{form.formState.errors.birthDate.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.birthDate.message}
+          </p>
         )}
       </div>
 
@@ -119,10 +145,11 @@ export function RegistrationStepTwo({
                   role="combobox"
                   aria-expanded={countryOpen}
                   className="w-full justify-between"
-                  disabled={isLoading}
+                  disabled={isLoading || isLoadingCountries}
                 >
                   {field.value
-                    ? countries.find((country) => country.value === field.value)?.label
+                    ? countries.find((country) => country.value === field.value)
+                        ?.label
                     : 'Select country'}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -138,14 +165,22 @@ export function RegistrationStepTwo({
                           key={country.value}
                           value={country.value}
                           onSelect={(currentValue) => {
-                            field.onChange(currentValue === field.value ? '' : currentValue);
+                            field.onChange(
+                              currentValue === field.value ? '' : currentValue
+                            );
+                            // Clear timezone when country changes
+                            if (currentValue !== field.value) {
+                              form.setValue('timezone', '');
+                            }
                             setCountryOpen(false);
                           }}
                         >
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4',
-                              field.value === country.value ? 'opacity-100' : 'opacity-0'
+                              field.value === country.value
+                                ? 'opacity-100'
+                                : 'opacity-0'
                             )}
                           />
                           {country.label}
@@ -159,12 +194,14 @@ export function RegistrationStepTwo({
           )}
         />
         {form.formState.errors.country && (
-          <p className="text-xs text-red-500">{form.formState.errors.country.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.country.message}
+          </p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="timezone">Timezone (Optional)</Label>
+        <Label htmlFor="timezone">Timezone</Label>
         <Controller
           name="timezone"
           control={form.control}
@@ -176,11 +213,15 @@ export function RegistrationStepTwo({
                   role="combobox"
                   aria-expanded={timezoneOpen}
                   className="w-full justify-between"
-                  disabled={isLoading}
+                  disabled={isLoading || isLoadingCountries || !selectedCountry}
                 >
                   {field.value
-                    ? timezones.find((timezone) => timezone.value === field.value)?.label
-                    : 'Select timezone'}
+                    ? timezones.find(
+                        (timezone) => timezone.value === field.value
+                      )?.label
+                    : selectedCountry
+                    ? 'Select timezone'
+                    : 'Select a country first'}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -195,14 +236,18 @@ export function RegistrationStepTwo({
                           key={timezone.value}
                           value={timezone.value}
                           onSelect={(currentValue) => {
-                            field.onChange(currentValue === field.value ? '' : currentValue);
+                            field.onChange(
+                              currentValue === field.value ? '' : currentValue
+                            );
                             setTimezoneOpen(false);
                           }}
                         >
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4',
-                              field.value === timezone.value ? 'opacity-100' : 'opacity-0'
+                              field.value === timezone.value
+                                ? 'opacity-100'
+                                : 'opacity-0'
                             )}
                           />
                           {timezone.label}
@@ -216,7 +261,9 @@ export function RegistrationStepTwo({
           )}
         />
         {form.formState.errors.timezone && (
-          <p className="text-xs text-red-500">{form.formState.errors.timezone.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.timezone.message}
+          </p>
         )}
       </div>
 
@@ -230,12 +277,19 @@ export function RegistrationStepTwo({
           {...form.register('personalPhoto')}
         />
         {form.formState.errors.personalPhoto?.message && (
-          <p className="text-xs text-red-500">{String(form.formState.errors.personalPhoto.message)}</p>
+          <p className="text-xs text-red-500">
+            {String(form.formState.errors.personalPhoto.message)}
+          </p>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Button type="button" onClick={onBack} variant="outline" disabled={isLoading}>
+        <Button
+          type="button"
+          onClick={onBack}
+          variant="outline"
+          disabled={isLoading}
+        >
           Back
         </Button>
         <Button type="submit" disabled={isLoading}>
