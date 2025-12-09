@@ -1,12 +1,11 @@
 import { Label } from '@/components/ui/label';
+import { UserType } from '@/lib/types/auth';
 import { cn } from '@/lib/utils';
 import { HiBriefcase, HiUserGroup } from 'react-icons/hi';
 
-type UserRole = 'client' | 'freelancer';
-
 interface RoleSelectorProps {
-  selectedRole: UserRole | null;
-  onRoleSelect: (role: UserRole) => void;
+  selectedRole: UserType | null;
+  onRoleSelect: (role: UserType) => void;
   disabled?: boolean;
 }
 
@@ -17,13 +16,13 @@ export const RoleSelector = ({
 }: RoleSelectorProps): React.ReactElement => {
   const roles = [
     {
-      id: 'freelancer' as UserRole,
+      id: 'CLIENT' as UserType,
       icon: HiBriefcase,
       title: 'Find Work',
       subtitle: 'As a Freelancer',
     },
     {
-      id: 'client' as UserRole,
+      id: 'FREELANCER' as UserType,
       icon: HiUserGroup,
       title: 'Hire Talent',
       subtitle: 'As a Client',
@@ -50,13 +49,23 @@ export const RoleSelector = ({
               )}
               disabled={disabled}
             >
-              <Icon className={cn('h-8 w-8 mb-2', isSelected ? 'text-primary' : 'text-gray-600')} />
+              <Icon
+                className={cn(
+                  'h-8 w-8 mb-2',
+                  isSelected ? 'text-primary' : 'text-gray-600'
+                )}
+              />
               <span
-                className={cn('font-medium', isSelected ? 'text-primary' : 'text-gray-700')}
+                className={cn(
+                  'font-medium',
+                  isSelected ? 'text-primary' : 'text-gray-700'
+                )}
               >
                 {role.title}
               </span>
-              <span className="text-xs text-gray-500 mt-1">{role.subtitle}</span>
+              <span className="text-xs text-gray-500 mt-1">
+                {role.subtitle}
+              </span>
             </button>
           );
         })}

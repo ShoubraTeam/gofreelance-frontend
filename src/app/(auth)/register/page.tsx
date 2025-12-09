@@ -16,12 +16,12 @@ import { ApiValidationError } from '@/lib/api/client';
 import {
   registrationSchema,
   type RegistrationFormData,
-  type UserRole,
 } from '@/lib/types/registration';
+import { UserType } from '@/lib/types/auth';
 
 export default function RegisterPage(): React.ReactElement {
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserType | null>(null);
   const [error, setError] = useState<string>('');
   const router = useRouter();
   const setTokens = useAuthStore((state) => state.setTokens);

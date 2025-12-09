@@ -3,12 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RoleSelector } from './RoleSelector';
-import type { RegistrationFormData, UserRole } from '@/lib/types/registration';
+import type { RegistrationFormData } from '@/lib/types/registration';
+import { UserType } from '@/lib/types/auth';
 
 interface RegistrationStepOneProps {
   form: UseFormReturn<RegistrationFormData>;
-  selectedRole: UserRole | null;
-  onRoleSelect: (role: UserRole) => void;
+  selectedRole: UserType | null;
+  onRoleSelect: (role: UserType) => void;
   isLoading: boolean;
   onNext: () => void;
 }
@@ -38,7 +39,9 @@ export function RegistrationStepOne({
             {...form.register('firstName')}
           />
           {form.formState.errors.firstName && (
-            <p className="text-xs text-red-500">{form.formState.errors.firstName.message}</p>
+            <p className="text-xs text-red-500">
+              {form.formState.errors.firstName.message}
+            </p>
           )}
         </div>
 
@@ -52,7 +55,9 @@ export function RegistrationStepOne({
             {...form.register('lastName')}
           />
           {form.formState.errors.lastName && (
-            <p className="text-xs text-red-500">{form.formState.errors.lastName.message}</p>
+            <p className="text-xs text-red-500">
+              {form.formState.errors.lastName.message}
+            </p>
           )}
         </div>
       </div>
@@ -67,7 +72,9 @@ export function RegistrationStepOne({
           {...form.register('email')}
         />
         {form.formState.errors.email && (
-          <p className="text-xs text-red-500">{form.formState.errors.email.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.email.message}
+          </p>
         )}
       </div>
 
@@ -81,7 +88,9 @@ export function RegistrationStepOne({
           {...form.register('password')}
         />
         {form.formState.errors.password && (
-          <p className="text-xs text-red-500">{form.formState.errors.password.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.password.message}
+          </p>
         )}
       </div>
 
@@ -95,7 +104,9 @@ export function RegistrationStepOne({
           {...form.register('confirmPassword')}
         />
         {form.formState.errors.confirmPassword && (
-          <p className="text-xs text-red-500">{form.formState.errors.confirmPassword.message}</p>
+          <p className="text-xs text-red-500">
+            {form.formState.errors.confirmPassword.message}
+          </p>
         )}
       </div>
 

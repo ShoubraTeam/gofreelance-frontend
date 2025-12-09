@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-export type UserRole = 'client' | 'freelancer';
-
 export const registrationSchema = z
   .object({
     // Step 1 fields

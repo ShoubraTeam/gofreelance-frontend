@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createCookieStorage } from '@/lib/utils/cookieStorage';
+import { createCookieStorage } from '@/lib/helpers/cookieStorage';
 import type { User } from '@/lib/types/auth';
 
 interface AuthState {

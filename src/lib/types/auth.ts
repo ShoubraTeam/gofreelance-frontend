@@ -1,12 +1,14 @@
-import type { RegistrationFormData, UserRole } from './registration';
+import type { RegistrationFormData } from './registration';
 
 export interface LoginCredentials {
   username: string;
   password: string;
 }
 
+export type UserType = 'CLIENT' | 'FREELANCER';
+
 export interface RegisterData extends RegistrationFormData {
-  userType: 'CLIENT' | 'FREELANCER';
+  userType: UserType;
 }
 
 export interface AuthResponse {
@@ -25,5 +27,3 @@ export interface User {
   freelancer: boolean;
   personalPhoto: string;
 }
-
-export type { UserRole };
