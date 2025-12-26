@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const protectedRoutes = [
-  '/dashboard',
-  '/profile',
-  '/settings',
-  '/onboarding',
-  '/projects',
-  '/contracts',
-  '/messages',
-];
+const protectedRoutes = ['/app'];
 
 const authRoutes = ['/login', '/register', '/forgot-password'];
 
@@ -24,11 +16,13 @@ export function proxy(request: NextRequest) {
 
   const authStorage = request.cookies.get('auth-storage');
   let isAuthenticated = false;
+  let userCurrentType: 'CLIENT' | 'FREELANCER' | null = null;
 
   if (authStorage) {
     try {
       const authData = JSON.parse(authStorage.value);
       isAuthenticated = !!authData?.state?.accessToken;
+      userCurrentType = authData?.state?.user?.currentType || null;
     } catch {
       isAuthenticated = false;
     }
@@ -41,7 +35,9 @@ export function proxy(request: NextRequest) {
   }
 
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const homeRoute =
+      userCurrentType === 'FREELANCER' ? '/app/find-work' : '/app/hire-talent';
+    return NextResponse.redirect(new URL(homeRoute, request.url));
   }
 
   return NextResponse.next();
