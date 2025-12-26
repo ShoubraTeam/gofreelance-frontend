@@ -1,14 +1,10 @@
 import { useAuthStore } from '@/store/useAuthStore';
+import type { ValidationError } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
-}
-
-export interface ValidationError {
-  field: string;
-  message: string;
 }
 
 export class ApiValidationError extends Error {

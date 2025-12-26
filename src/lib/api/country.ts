@@ -1,6 +1,8 @@
 import { apiClient } from './client';
-import type { CountryResponse } from '../types/country';
+import type { ApiResponse } from '../types/api';
 
-export async function getCountries(): Promise<CountryResponse> {
-  return apiClient.get<CountryResponse>('/country');
+export async function getCountries(): Promise<
+  ApiResponse<Record<string, string[]>>
+> {
+  return apiClient.get<ApiResponse<Record<string, string[]>>>('/country');
 }
