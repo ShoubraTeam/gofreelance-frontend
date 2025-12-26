@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Navbar } from '@/components/landing/Navbar';
 
 export const metadata: Metadata = {
   title: 'Authentication | GoFreelance',
@@ -10,5 +11,10 @@ export default function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>): React.ReactElement {
-  return <>{children}</>;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 }

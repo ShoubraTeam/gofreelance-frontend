@@ -12,18 +12,31 @@ import { AuthFooter } from '../_components/AuthFooter';
 import { useLogin } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ApiValidationError } from '@/lib/api/client';
+import { verifyToken } from '@/lib/api/auth';
+import { getHomeRoute } from '@/lib/utils';
 
 export default function LoginPage(): React.ReactElement {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const router = useRouter();
-  const setTokens = useAuthStore((state) => state.setTokens);
+  const { setTokens, setUser } = useAuthStore();
 
   const { mutate: login, isPending: isLoading } = useLogin({
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       setTokens(response.data.accessToken, response.data.refreshToken);
-      router.push('/dashboard');
+
+      try {
+        const userResponse = await verifyToken();
+        const user = userResponse.data;
+        setUser(user);
+
+        // Navigate based on current user type
+        router.push(getHomeRoute(user.currentType));
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+        router.push('/');
+      }
     },
     onError: (err) => {
       if (err instanceof ApiValidationError) {
