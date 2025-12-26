@@ -1,5 +1,5 @@
 import { Navbar } from '@/components/landing/Navbar';
-import { Footer } from '@/components/landing/Footer';
+import { Footer } from '@/components/Footer';
 import { HeroSection } from './_components/HeroSection';
 import { StatsSection } from './_components/StatsSection';
 import { FeaturesSection } from './_components/FeaturesSection';
