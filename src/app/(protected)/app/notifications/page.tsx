@@ -40,7 +40,7 @@ export default function NotificationsPage() {
             </h3>
             <p className="text-muted-foreground mb-6">
               When you receive notifications about your jobs, messages, or proposals,
-              they'll appear here.
+              they&apos;ll appear here.
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
               <Badge className="bg-primary/10 text-primary border-primary/20">
