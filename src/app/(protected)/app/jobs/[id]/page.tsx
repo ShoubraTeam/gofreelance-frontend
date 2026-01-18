@@ -4,24 +4,16 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
-import {
-  FiBriefcase,
-  FiDollarSign,
-  FiCalendar,
-  FiUsers,
-  FiFileText,
-} from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { getJobById } from '@/lib/api/jobs';
 import { createProposal, getMyProposals, editProposal, deleteProposal } from '@/lib/api/proposals';
 import { getProfiles } from '@/lib/api/profile';
 import type { ProposalResponse, EditProposalRequest } from '@/lib/types/proposal';
+import { JobHeader } from './_components/JobHeader';
+import { JobDescription } from './_components/JobDescription';
+import { ProposalSection } from './_components/ProposalSection';
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -181,250 +173,42 @@ export default function JobDetailsPage() {
     );
   }
 
-  const formatExperienceLevel = (level: string) => {
-    const formatted = level.replace('_', ' ').toLowerCase();
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  };
-
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardContent className="p-8">
-            {/* Job Header */}
-            <div className="mb-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-foreground mb-2">
-                    {job.title}
-                  </h1>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={job.jobStatus === 'OPEN' ? 'default' : 'outline'}
-                      className={
-                        job.jobStatus === 'OPEN'
-                          ? 'bg-green-500 hover:bg-green-600'
-                          : ''
-                      }
-                    >
-                      {job.jobStatus}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <FiDollarSign className="w-5 h-5 text-primary" />
-                  <span className="text-muted-foreground">Budget:</span>
-                  <span className="font-semibold text-lg">
-                    ${job.jobPrice.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FiUsers className="w-5 h-5 text-primary" />
-                  <span className="text-muted-foreground">Experience:</span>
-                  <span className="font-semibold">
-                    {formatExperienceLevel(job.experienceLevel)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FiCalendar className="w-5 h-5 text-primary" />
-                  <span className="text-muted-foreground">Posted:</span>
-                  <span className="font-semibold">
-                    {new Date(job.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <JobHeader
+              title={job.title}
+              jobStatus={job.jobStatus}
+              jobPrice={job.jobPrice}
+              experienceLevel={job.experienceLevel}
+              createdAt={job.createdAt}
+            />
 
             <Separator className="my-6" />
 
-            {/* Job Description */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <FiFileText className="w-5 h-5 text-primary" />
-                Job Description
-              </h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {job.content}
-              </p>
-            </div>
+            <JobDescription content={job.content} />
 
             <Separator className="my-6" />
 
-            {/* Proposal Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <FiBriefcase className="w-5 h-5 text-primary" />
-                  {existingProposal && !isEditMode ? 'Your Proposal' : 'Submit Your Proposal'}
-                </h2>
-                {existingProposal && !isEditMode && (
-                  <div className="flex gap-2">
-                    <Badge
-                      variant={
-                        existingProposal.status === 'PENDING'
-                          ? 'default'
-                          : existingProposal.status === 'ACCEPTED'
-                          ? 'default'
-                          : 'destructive'
-                      }
-                      className={
-                        existingProposal.status === 'PENDING'
-                          ? 'bg-yellow-500 hover:bg-yellow-600'
-                          : existingProposal.status === 'ACCEPTED'
-                          ? 'bg-green-500 hover:bg-green-600'
-                          : ''
-                      }
-                    >
-                      {existingProposal.status}
-                    </Badge>
-                  </div>
-                )}
-              </div>
-
-              {existingProposal && !isEditMode ? (
-                <div className="space-y-4">
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Proposal</p>
-                    <p className="text-foreground whitespace-pre-wrap">
-                      {existingProposal.content}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-1">Your Bid</p>
-                      <p className="text-2xl font-bold text-primary">
-                        ${existingProposal.totalPrice.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground mb-1">Estimated Hours</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {existingProposal.totalTimeHours} hours
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-1">Submitted On</p>
-                    <p className="text-foreground">
-                      {new Date(existingProposal.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleEditClick}
-                      variant="outline"
-                      disabled={existingProposal.status !== 'PENDING'}
-                    >
-                      Edit Proposal
-                    </Button>
-                    <Button
-                      onClick={handleWithdraw}
-                      variant="destructive"
-                      disabled={isPending || existingProposal.status !== 'PENDING'}
-                    >
-                      {isDeleting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Withdrawing...
-                        </>
-                      ) : (
-                        'Withdraw Proposal'
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">
-                    Your Proposal
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <Textarea
-                    value={proposalContent}
-                    onChange={(e) => setProposalContent(e.target.value)}
-                    rows={6}
-                    placeholder="Explain why you're the best fit for this job. Describe your relevant experience and how you plan to approach this project..."
-                    className="resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Write a compelling proposal to stand out from other freelancers
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-foreground mb-2">
-                      Your Bid ($)
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <Input
-                      type="number"
-                      value={proposalPrice}
-                      onChange={(e) => setProposalPrice(e.target.value)}
-                      placeholder="5000"
-                      min={1}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Client&apos;s budget: ${job.jobPrice.toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-foreground mb-2">
-                      Estimated Hours
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <Input
-                      type="number"
-                      value={proposalHours}
-                      onChange={(e) => setProposalHours(e.target.value)}
-                      placeholder="40"
-                      min={1}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Total time needed to complete the project
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSubmitProposal}
-                    disabled={isPending}
-                    size="lg"
-                    className="w-full sm:w-auto"
-                  >
-                    {isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {isEditMode ? 'Updating...' : 'Submitting...'}
-                      </>
-                    ) : (
-                      isEditMode ? 'Update Proposal' : 'Submit Proposal'
-                    )}
-                  </Button>
-                  {isEditMode && (
-                    <Button
-                      onClick={handleCancelEdit}
-                      variant="outline"
-                      size="lg"
-                      disabled={isPending}
-                    >
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </div>
-              )}
-            </div>
+            <ProposalSection
+              existingProposal={existingProposal}
+              isEditMode={isEditMode}
+              proposalContent={proposalContent}
+              proposalPrice={proposalPrice}
+              proposalHours={proposalHours}
+              jobPrice={job.jobPrice}
+              isDeleting={isDeleting}
+              isPending={isPending}
+              onContentChange={setProposalContent}
+              onPriceChange={setProposalPrice}
+              onHoursChange={setProposalHours}
+              onSubmit={handleSubmitProposal}
+              onEdit={handleEditClick}
+              onCancel={handleCancelEdit}
+              onWithdraw={handleWithdraw}
+            />
           </CardContent>
         </Card>
       </div>
