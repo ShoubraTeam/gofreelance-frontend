@@ -23,14 +23,7 @@ export default function HireTalentPage() {
   const [activeTab, setActiveTab] = useState<'jobs' | 'talent'>('jobs');
   const [talentSearch, setTalentSearch] = useState('');
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<NewJobRequest>({
+  const form = useForm<NewJobRequest>({
     defaultValues: {
       title: '',
       content: '',
@@ -39,6 +32,8 @@ export default function HireTalentPage() {
       jobType: 'JOB',
     },
   });
+
+  const { reset } = form;
 
   const { data: jobsData, isLoading } = useQuery({
     queryKey: ['client-jobs', user?.id],
@@ -158,7 +153,7 @@ export default function HireTalentPage() {
 
         {activeTab === 'jobs' && shouldShowForm && (
           <JobCreationForm
-            form={{ register, handleSubmit, watch, setValue, formState: { errors } }}
+            form={form}
             currentStep={currentStep}
             totalSteps={totalSteps}
             isPending={isPending}
