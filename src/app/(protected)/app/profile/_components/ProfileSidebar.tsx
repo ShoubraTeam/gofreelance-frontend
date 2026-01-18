@@ -2,7 +2,7 @@
 
 import { useQueries } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
-import type { GetProfileResponse } from '@/lib/types/profile';
+import type { GetProfileResponse, GetFreelancerProfileDetailsResponse, GetClientProfileDetailsResponse } from '@/lib/types/profile';
 import { getFreelancerProfileDetails, getClientProfileDetails } from '@/lib/api/profile';
 import { HiPlus } from 'react-icons/hi';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -52,7 +52,7 @@ export function ProfileSidebar({ profiles, selectedProfileId, onProfileSelect }:
   const totalJobs = 0;
 
   const specialization = isFreelancer && selectedProfileDetails
-    ? (selectedProfileDetails as any)?.specialization?.type
+    ? (selectedProfileDetails as GetFreelancerProfileDetailsResponse)?.specialization?.type
     : null;
 
   const handleCreateProfile = (profileType: 'freelancer' | 'client') => {
@@ -85,8 +85,8 @@ export function ProfileSidebar({ profiles, selectedProfileId, onProfileSelect }:
                 const isSelected = selectedProfileId === profile.id;
 
                 const displayTitle = isFreelancer
-                  ? (details as any)?.title || 'Loading...'
-                  : (details as any)?.companyName || 'Loading...';
+                  ? (details as GetFreelancerProfileDetailsResponse)?.title || 'Loading...'
+                  : (details as GetClientProfileDetailsResponse)?.companyName || 'Loading...';
 
                 return (
                   <div

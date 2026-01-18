@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -105,11 +106,12 @@ export function ProfileCertificationsSection({
                   onClick={() => handleView(cert)}
                 >
                   {cert.imageUrl && (
-                    <div className="relative w-full bg-muted">
-                      <img
+                    <div className="relative w-full bg-muted h-64">
+                      <Image
                         src={cert.imageUrl}
                         alt={cert.name}
-                        className="w-full h-auto object-contain max-h-64"
+                        fill
+                        className="object-contain"
                       />
                     </div>
                   )}
@@ -173,11 +175,12 @@ export function ProfileCertificationsSection({
           </DialogHeader>
           <div className="mt-4">
             {viewingCert?.imageUrl && (
-              <div className="w-full bg-muted rounded-lg overflow-hidden">
-                <img
+              <div className="relative w-full bg-muted rounded-lg overflow-hidden h-96">
+                <Image
                   src={viewingCert.imageUrl}
                   alt={viewingCert.name}
-                  className="w-full h-auto object-contain"
+                  fill
+                  className="object-contain"
                 />
               </div>
             )}

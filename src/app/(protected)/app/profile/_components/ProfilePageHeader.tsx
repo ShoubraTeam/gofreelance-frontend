@@ -12,6 +12,7 @@ import {
 import { capitalize } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ProfilePageHeaderProps {
   account: AccountInfo;
@@ -19,6 +20,7 @@ interface ProfilePageHeaderProps {
 
 export function ProfilePageHeader({ account }: ProfilePageHeaderProps) {
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -31,7 +33,7 @@ export function ProfilePageHeader({ account }: ProfilePageHeaderProps) {
   };
 
   const handleViewPublic = () => {
-    const publicProfileUrl = `/profile/public/${account.id}`;
+    const publicProfileUrl = `/profile/public/${user?.id}`;
     window.open(publicProfileUrl, '_blank');
   };
 

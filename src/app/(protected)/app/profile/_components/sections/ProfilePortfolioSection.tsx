@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -120,10 +121,11 @@ export function ProfilePortfolioSection({
 
                   {project.imageUrl && (
                     <div className="relative w-full h-48 bg-muted">
-                      <img
+                      <Image
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     </div>
                   )}
@@ -181,11 +183,12 @@ export function ProfilePortfolioSection({
           </DialogHeader>
           <div className="mt-4 space-y-4">
             {viewingProject?.imageUrl && (
-              <div className="w-full bg-muted rounded-lg overflow-hidden">
-                <img
+              <div className="relative w-full bg-muted rounded-lg overflow-hidden h-96">
+                <Image
                   src={viewingProject.imageUrl}
                   alt={viewingProject.title}
-                  className="w-full h-auto object-contain"
+                  fill
+                  className="object-contain"
                 />
               </div>
             )}

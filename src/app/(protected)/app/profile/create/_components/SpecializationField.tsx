@@ -6,8 +6,10 @@ interface Specialization {
 }
 
 interface SpecializationFieldProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
-  errors: FieldErrors;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: FieldErrors<any>;
   specializations: Specialization[];
 }
 

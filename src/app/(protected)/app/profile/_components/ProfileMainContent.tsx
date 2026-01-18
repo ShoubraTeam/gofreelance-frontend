@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { GetProfileResponse } from '@/lib/types/profile';
+import type { GetProfileResponse, GetFreelancerProfileDetailsResponse } from '@/lib/types/profile';
 import Link from 'next/link';
 import { getFreelancerProfileDetails, getClientProfileDetails } from '@/lib/api/profile';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -86,13 +86,14 @@ export function ProfileMainContent({
   if (!profile) return null;
 
   if (isFreelancer) {
+    const freelancerProfile = profile as GetFreelancerProfileDetailsResponse;
     return (
       <div className="space-y-4">
-        <ProfileBioSection profile={profile} onUpdate={refetch} />
-        <ProfileSkillsSection profile={profile} onUpdate={refetch} />
-        <ProfileWorkExperienceSection profile={profile} onUpdate={refetch} />
-        <ProfilePortfolioSection profile={profile} onUpdate={refetch} />
-        <ProfileCertificationsSection profile={profile} onUpdate={refetch} />
+        <ProfileBioSection profile={freelancerProfile} onUpdate={refetch} />
+        <ProfileSkillsSection profile={freelancerProfile} onUpdate={refetch} />
+        <ProfileWorkExperienceSection profile={freelancerProfile} onUpdate={refetch} />
+        <ProfilePortfolioSection profile={freelancerProfile} onUpdate={refetch} />
+        <ProfileCertificationsSection profile={freelancerProfile} onUpdate={refetch} />
       </div>
     );
   }

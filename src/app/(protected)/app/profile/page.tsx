@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAccountInfo } from '@/lib/api/auth';
 import { getProfiles } from '@/lib/api/profile';
@@ -32,8 +32,9 @@ export default function ProfilePage() {
     queryFn: getProfiles,
   });
 
-  const profiles = profilesData?.data || [];
+  const profiles = useMemo(() => profilesData?.data || [], [profilesData?.data]);
 
+  // Initialize selected profile when profiles are loaded - this is intentional
   useEffect(() => {
     if (!selectedProfileId && profiles.length > 0 && user) {
       const isFreelancer = user.currentType === UserType.FREELANCER;
@@ -41,10 +42,11 @@ export default function ProfilePage() {
         (p) => p.profileType === (isFreelancer ? 'FREELANCER' : 'CLIENT')
       );
       if (currentTypeProfiles.length > 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedProfileId(currentTypeProfiles[0].id);
       }
     }
-  }, [profiles, selectedProfileId, user]);
+  }, [profiles.length, selectedProfileId, user]);
 
   if (isLoadingAccount || isLoadingProfiles) {
     return (

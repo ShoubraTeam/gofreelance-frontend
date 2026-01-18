@@ -1,8 +1,10 @@
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 
 interface TitleFieldProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<any>;
-  errors: FieldErrors;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: FieldErrors<any>;
   titleLength: number;
 }
 

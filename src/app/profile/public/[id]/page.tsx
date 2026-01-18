@@ -25,7 +25,7 @@ interface PageProps {
 }
 
 export default function PublicProfilePage({ params }: PageProps) {
-  const { id } = use(params);
+  use(params);
   const router = useRouter();
 
   const handleGoBack = () => {
@@ -81,7 +81,7 @@ export default function PublicProfilePage({ params }: PageProps) {
           <CardContent className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-2">Profile Not Found</h2>
             <p className="text-muted-foreground">
-              The profile you're looking for doesn't exist.
+              The profile you&apos;re looking for doesn&apos;t exist.
             </p>
           </CardContent>
         </Card>
