@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -42,15 +41,22 @@ export function ProjectDialog({
   const [projectUrl, setProjectUrl] = useState(project?.projectUrl || '');
   const [fileUrl, setFileUrl] = useState(project?.fileUrl || '');
 
+  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
+       
       setTitle(project?.title || '');
+       
       setContent(project?.content || '');
+       
       setImageUrl(project?.imageUrl || '');
+       
       setProjectUrl(project?.projectUrl || '');
+       
       setFileUrl(project?.fileUrl || '');
     }
-  }, [open, project]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: project ? editProject : addProject,

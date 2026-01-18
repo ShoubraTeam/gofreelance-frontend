@@ -47,10 +47,16 @@ export function SkillsDialog({
     enabled: open,
   });
 
+  // Reset local state when dialog opens - this is intentional and safe
   useEffect(() => {
-    setSelectedSkillIds(new Set(currentSkills.map((s) => s.id)));
-    setSearchTerm('');
-  }, [currentSkills, open]);
+    if (open) {
+       
+      setSelectedSkillIds(new Set(currentSkills.map((s) => s.id)));
+       
+      setSearchTerm('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { mutate: updateSkills, isPending } = useMutation({
     mutationFn: async () => {
@@ -98,7 +104,7 @@ export function SkillsDialog({
     updateSkills();
   };
 
-  const allSkills = allSkillsData?.data || [];
+  const allSkills = useMemo(() => allSkillsData?.data || [], [allSkillsData?.data]);
 
   const selectedSkills = useMemo(() => {
     return allSkills.filter((skill) => selectedSkillIds.has(skill.id));

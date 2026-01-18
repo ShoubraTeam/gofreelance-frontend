@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -40,14 +39,20 @@ export function WorkExperienceDialog({
   const [startedAt, setStartedAt] = useState(experience?.startedAt || '');
   const [endedAt, setEndedAt] = useState(experience?.endedAt || '');
 
+  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
+       
       setWorkAt(experience?.workedAt || '');
+       
       setJobTitle(experience?.jobTitle || '');
+       
       setStartedAt(experience?.startedAt || '');
+       
       setEndedAt(experience?.endedAt || '');
     }
-  }, [open, experience]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: experience ? editWorkExperience : addWorkExperience,

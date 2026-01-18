@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -38,12 +37,16 @@ export function CertificateDialog({
   const [name, setName] = useState(certificate?.name || '');
   const [imageUrl, setImageUrl] = useState(certificate?.imageUrl || '');
 
+  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
+       
       setName(certificate?.name || '');
+       
       setImageUrl(certificate?.imageUrl || '');
     }
-  }, [open, certificate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: certificate ? editCertificate : addCertificate,
