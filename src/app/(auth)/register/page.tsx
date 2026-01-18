@@ -108,7 +108,7 @@ export default function RegisterPage(): React.ReactElement {
       country: data.country,
       timezone: data.timezone,
       personalPhoto: data.personalPhoto,
-      userType: selectedRole.toUpperCase() as 'CLIENT' | 'FREELANCER',
+      userType: selectedRole,
     });
   };
 
