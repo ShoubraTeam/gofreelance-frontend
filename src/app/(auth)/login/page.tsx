@@ -83,6 +83,7 @@ export default function LoginPage(): React.ReactElement {
             <Link
               href="/forgot-password"
               className="text-sm text-primary hover:text-primary/80 hover:underline"
+              tabIndex={-1}
             >
               Forgot password?
             </Link>

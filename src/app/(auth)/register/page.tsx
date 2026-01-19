@@ -29,7 +29,9 @@ export default function RegisterPage(): React.ReactElement {
   const { mutate: register, isPending: isLoading } = useRegister({
     onSuccess: (response) => {
       setTokens(response.data.accessToken, response.data.refreshToken);
-      router.push('/onboarding');
+      const redirectPath =
+        selectedRole === UserType.CLIENT ? '/app/hire-talent' : '/app/find-work';
+      router.push(redirectPath);
     },
     onError: (err) => {
       if (err instanceof ApiValidationError) {
