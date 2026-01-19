@@ -30,6 +30,7 @@ export function useProfileCheck() {
   return {
     profiles,
     hasProfile,
+    hasClientProfile,
     needsClientProfile,
     needsFreelancerProfile,
     isLoading,
