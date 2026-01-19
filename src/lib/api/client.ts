@@ -1,10 +1,12 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import type { ValidationError } from '../types/api';
 
-const API_BASE_URL =
-  process.env.NODE_ENV === 'production'
-    ? 'http://5.75.139.88:8080/api/v1'
-    : 'http://localhost:8080/api/v1';
+// const API_BASE_URL =
+//   process.env.NODE_ENV === 'production'
+//     ? 'http://5.75.139.88:8080/api/v1'
+//     : 'http://localhost:8080/api/v1';
+
+const API_BASE_URL = 'https://api.gofreelance.app'
 
 interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
