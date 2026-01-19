@@ -16,13 +16,13 @@ export const RoleSelector = ({
 }: RoleSelectorProps): React.ReactElement => {
   const roles = [
     {
-      id: 'CLIENT' as UserType,
+      id: 'FREELANCER' as UserType,
       icon: HiBriefcase,
       title: 'Find Work',
       subtitle: 'As a Freelancer',
     },
     {
-      id: 'FREELANCER' as UserType,
+      id: 'CLIENT' as UserType,
       icon: HiUserGroup,
       title: 'Hire Talent',
       subtitle: 'As a Client',
