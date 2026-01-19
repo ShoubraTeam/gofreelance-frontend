@@ -30,6 +30,7 @@ export function ProfileSidebar({ profiles, selectedProfileId, onProfileSelect }:
     : clientProfiles;
 
   const isFreelancer = user?.currentType === UserType.FREELANCER;
+  const canCreateProfile = isFreelancer || clientProfiles.length === 0;
 
   const profileDetailsQueries = useQueries({
     queries: currentProfiles.map((profile) => ({
@@ -65,16 +66,18 @@ export function ProfileSidebar({ profiles, selectedProfileId, onProfileSelect }:
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-left">View profile</h2>
-            <button
-              onClick={() => {
-                const profileType = user?.currentType === UserType.FREELANCER ? 'freelancer' : 'client';
-                handleCreateProfile(profileType);
-              }}
-              className="p-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer shadow-sm"
-              title={`Create New ${user?.currentType === UserType.FREELANCER ? 'Freelancer' : 'Client'} Profile`}
-            >
-              <HiPlus className="w-4 h-4" />
-            </button>
+            {canCreateProfile && (
+              <button
+                onClick={() => {
+                  const profileType = user?.currentType === UserType.FREELANCER ? 'freelancer' : 'client';
+                  handleCreateProfile(profileType);
+                }}
+                className="p-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer shadow-sm"
+                title={`Create New ${user?.currentType === UserType.FREELANCER ? 'Freelancer' : 'Client'} Profile`}
+              >
+                <HiPlus className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { createClientProfile } from '@/lib/api/profile';
 import type { CreateClientProfileRequest } from '@/lib/types/profile';
+import { useProfileCheck } from '@/hooks/useProfileCheck';
 import { ProfileFormHeader } from '../_components/ProfileFormHeader';
 import { CompanyNameField } from '../_components/CompanyNameField';
 import { BioField } from '../_components/BioField';
@@ -15,6 +17,13 @@ import { SubmitButton } from '../_components/SubmitButton';
 export default function CreateClientProfilePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { hasClientProfile, isLoading: isCheckingProfile } = useProfileCheck();
+
+  useEffect(() => {
+    if (!isCheckingProfile && hasClientProfile) {
+      router.replace('/app/profile');
+    }
+  }, [hasClientProfile, isCheckingProfile, router]);
 
   const {
     register,
@@ -38,6 +47,10 @@ export default function CreateClientProfilePage() {
 
   const bioValue = watch('bio', '');
   const bioLength = bioValue.length;
+
+  if (isCheckingProfile || hasClientProfile) {
+    return null;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 lg:px-8 py-12">

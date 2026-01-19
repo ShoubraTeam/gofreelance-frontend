@@ -3,7 +3,7 @@ import type { ValidationError } from '../types/api';
 
 const API_BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'http://api.gofreelance.app/api/v1'
+    ? 'https://api.gofreelance.app/api/v1'
     : 'http://localhost:8080/api/v1';
 
 
