@@ -1,10 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FiDollarSign, FiUsers, FiCalendar, FiPlus } from 'react-icons/fi';
 import type { JobResponse } from '@/lib/types/job';
+import { capitalize } from '@/lib/utils';
 
 interface JobListProps {
   jobs: JobResponse[];
@@ -13,11 +15,7 @@ interface JobListProps {
 }
 
 export function JobList({ jobs, onCreateJob, onEditJob }: JobListProps) {
-  const formatExperienceLevel = (level: string) => {
-    const formatted = level.replace('_', ' ').toLowerCase();
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  };
-
+  const router = useRouter();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -61,7 +59,7 @@ export function JobList({ jobs, onCreateJob, onEditJob }: JobListProps) {
                     <FiUsers className="w-4 h-4 text-primary" />
                     <span className="text-muted-foreground">Experience:</span>
                     <span className="font-semibold">
-                      {formatExperienceLevel(job.experienceLevel)}
+                      {capitalize(job.experienceLevel)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -75,13 +73,9 @@ export function JobList({ jobs, onCreateJob, onEditJob }: JobListProps) {
               </div>
             </div>
 
-            <div className="border-t pt-4 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <FiUsers className="w-4 h-4" />
-                <span>0 proposals received</span>
-              </div>
+            <div className="border-t pt-4 flex items-center justify-end">
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => router.push(`/app/hire-talent/${job.id}/proposals`)}>
                   <FiUsers className="w-4 h-4 mr-2" />
                   View Proposals
                 </Button>

@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import type { JobResponse, ExperienceLevel } from '@/lib/types/job';
+import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/types/job';
 
 interface EditJobDialogProps {
   job: JobResponse | null;
@@ -82,11 +83,9 @@ export function EditJobDialog({ job, isUpdating, onClose, onUpdate }: EditJobDia
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ANY">Any Level</SelectItem>
-                <SelectItem value="JUNIOR">Junior (0-2 years)</SelectItem>
-                <SelectItem value="MID_LEVEL">Mid Level (2-5 years)</SelectItem>
-                <SelectItem value="SENIOR">Senior (5+ years)</SelectItem>
-                <SelectItem value="EXPERT">Expert (10+ years)</SelectItem>
+                {EXPERIENCE_LEVEL_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

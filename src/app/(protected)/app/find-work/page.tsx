@@ -26,23 +26,7 @@ export default function FindWorkPage() {
     queryFn: () => getPublicJobs(currentPage),
   });
 
-  interface PagedResponse {
-    content: Array<{
-      id: string;
-      title: string;
-      content: string;
-      jobPrice: number;
-      createdAt: string;
-      experienceLevel: string;
-    }>;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
-    number: number;
-  }
-
-  const pagedData = (jobsData?.data as unknown as PagedResponse);
+  const pagedData = jobsData?.data;
   const apiJobs = pagedData?.content || [];
   const totalPages = pagedData?.totalPages || 1;
   const isFirstPage = pagedData?.first ?? true;

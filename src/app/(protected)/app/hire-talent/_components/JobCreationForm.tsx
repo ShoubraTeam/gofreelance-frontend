@@ -15,6 +15,8 @@ import { Loader2 } from 'lucide-react';
 import { FiPlus } from 'react-icons/fi';
 import type { UseFormReturn } from 'react-hook-form';
 import type { NewJobRequest, ExperienceLevel } from '@/lib/types/job';
+import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/types/job';
+import type { GetProfileResponse } from '@/lib/types/profile';
 
 interface JobCreationFormProps {
   form: UseFormReturn<NewJobRequest>;
@@ -22,6 +24,7 @@ interface JobCreationFormProps {
   totalSteps: number;
   isPending: boolean;
   hasExistingJobs: boolean;
+  clientProfiles: GetProfileResponse[];
   onStepChange: (step: number) => void;
   onCancel: () => void;
   onSubmit: (data: NewJobRequest) => void;
@@ -33,24 +36,22 @@ export function JobCreationForm({
   totalSteps,
   isPending,
   hasExistingJobs,
+  clientProfiles,
   onStepChange,
   onCancel,
   onSubmit,
 }: JobCreationFormProps) {
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = form;
+  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = form;
   const experienceLevel = watch('experienceLevel');
+  const profileId = watch('profileId');
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
-      const titleValue = watch('title');
-      if (titleValue && titleValue.length > 0) {
-        onStepChange(2);
-      }
+      const valid = await trigger(['profileId', 'title']);
+      if (valid) onStepChange(2);
     } else if (currentStep === 2) {
-      const contentValue = watch('content');
-      if (contentValue && contentValue.length > 0) {
-        onStepChange(3);
-      }
+      const valid = await trigger(['content']);
+      if (valid) onStepChange(3);
     }
   };
 
@@ -99,7 +100,37 @@ export function JobCreationForm({
             <div className="space-y-4">
               <div>
                 <label className="block text-lg font-semibold text-foreground mb-3">
-                  What is your job title?
+                  Which profile are you hiring as?
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <Select
+                  value={profileId}
+                  onValueChange={(value) => setValue('profileId', value)}
+                >
+                  <SelectTrigger className={`text-base ${errors.profileId ? 'border-destructive' : ''}`}>
+                    <SelectValue placeholder="Select a profile" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientProfiles.map((profile) => (
+                      <SelectItem key={profile.id} value={profile.id}>
+                        {profile.title || profile.id}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <input
+                  type="hidden"
+                  {...register('profileId', { required: 'Please select a profile' })}
+                />
+                {errors.profileId && (
+                  <p className="mt-2 text-sm text-destructive">
+                    {errors.profileId.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-lg font-semibold text-foreground mb-3">
+                  What is the job title?
                   <span className="text-red-500 ml-1">*</span>
                 </label>
                 <Input
@@ -195,11 +226,9 @@ export function JobCreationForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ANY">Any Level</SelectItem>
-                    <SelectItem value="JUNIOR">Junior (0-2 years)</SelectItem>
-                    <SelectItem value="MID_LEVEL">Mid Level (2-5 years)</SelectItem>
-                    <SelectItem value="SENIOR">Senior (5+ years)</SelectItem>
-                    <SelectItem value="EXPERT">Expert (10+ years)</SelectItem>
+                    {EXPERIENCE_LEVEL_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <p className="mt-2 text-sm text-muted-foreground">

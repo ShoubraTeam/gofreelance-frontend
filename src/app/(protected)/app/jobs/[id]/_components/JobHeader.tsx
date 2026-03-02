@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { FiDollarSign, FiCalendar, FiUsers } from 'react-icons/fi';
+import { capitalize } from '@/lib/utils';
 
 interface JobHeaderProps {
   title: string;
@@ -16,11 +17,6 @@ export function JobHeader({
   experienceLevel,
   createdAt,
 }: JobHeaderProps) {
-  const formatExperienceLevel = (level: string) => {
-    const formatted = level.replace('_', ' ').toLowerCase();
-    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  };
-
   return (
     <div className="mb-6">
       <div className="flex items-start justify-between mb-4">
@@ -51,7 +47,7 @@ export function JobHeader({
           <FiUsers className="w-5 h-5 text-primary" />
           <span className="text-muted-foreground">Experience:</span>
           <span className="font-semibold">
-            {formatExperienceLevel(experienceLevel)}
+            {capitalize(experienceLevel)}
           </span>
         </div>
         <div className="flex items-center gap-2">

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/useAuthStore';
 import { createJob, getClientJobs, updateJob } from '@/lib/api/jobs';
+import { getProfiles } from '@/lib/api/profile';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { NewJobRequest, ExperienceLevel, JobResponse } from '@/lib/types/job';
@@ -25,6 +26,7 @@ export default function HireTalentPage() {
 
   const form = useForm<NewJobRequest>({
     defaultValues: {
+      profileId: '',
       title: '',
       content: '',
       jobPrice: 0,
@@ -33,12 +35,28 @@ export default function HireTalentPage() {
     },
   });
 
-  const { reset } = form;
+  const { reset, setValue } = form;
+
+  const { data: profilesData } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: getProfiles,
+    enabled: !!user,
+  });
+
+  const clientProfiles = profilesData?.data?.filter(p => p.profileType === 'CLIENT') ?? [];
+  const profileId = clientProfiles.length === 1 ? clientProfiles[0].id : undefined;
+
+
+  useEffect(() => {
+    if (profileId) {
+      setValue('profileId', profileId);
+    }
+  }, [profileId, setValue]);
 
   const { data: jobsData, isLoading } = useQuery({
-    queryKey: ['client-jobs', user?.id],
-    queryFn: () => getClientJobs(user!.id),
-    enabled: !!user?.id,
+    queryKey: ['client-jobs', profileId],
+    queryFn: () => getClientJobs(profileId!),
+    enabled: !!profileId,
   });
 
   const { mutate: createJobMutation, isPending } = useMutation({
@@ -158,6 +176,7 @@ export default function HireTalentPage() {
             totalSteps={totalSteps}
             isPending={isPending}
             hasExistingJobs={jobs.length > 0}
+            clientProfiles={clientProfiles}
             onStepChange={setCurrentStep}
             onCancel={() => {
               setShowCreateForm(false);
@@ -188,6 +207,7 @@ export default function HireTalentPage() {
           onClose={() => setEditingJob(null)}
           onUpdate={handleUpdateJob}
         />
+
       </div>
     </div>
   );
