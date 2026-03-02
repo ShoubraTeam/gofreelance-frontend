@@ -1,31 +1,40 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getProfiles } from '@/lib/api/profile';
+import { getAccountInfo } from '@/lib/api/auth';
+import { UserType, type IdentityStatus } from '@/lib/types/auth';
 
 export function useProfileCheck() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, _hasHydrated } = useAuthStore();
 
-  const { data, isLoading, error } = useQuery({
+  const { data: profilesData, isLoading: isLoadingProfiles, error: profilesError } = useQuery({
     queryKey: ['profiles'],
     queryFn: getProfiles,
     enabled: isAuthenticated,
     retry: 1,
   });
 
-  const profiles = data?.data || [];
+  const { data: accountData, isLoading: isLoadingAccount } = useQuery({
+    queryKey: ['account', 'info'],
+    queryFn: getAccountInfo,
+    enabled: isAuthenticated,
+    retry: 1,
+  });
+
+  const profiles = profilesData?.data || [];
   const hasProfile = profiles.length > 0;
 
-  // Check if the account is a client or freelancer
-  const isClient = user?.client === true;
-  const isFreelancer = user?.freelancer === true;
+  const currentType = user?.currentType;
 
-  // Check if client/freelancer profiles exist
   const hasClientProfile = profiles.some(p => p.profileType === 'CLIENT');
   const hasFreelancerProfile = profiles.some(p => p.profileType === 'FREELANCER');
 
-  // Determine which type of profile the user should create based on account type
-  const needsClientProfile = isClient && !hasClientProfile;
-  const needsFreelancerProfile = isFreelancer && !hasFreelancerProfile;
+  const needsClientProfile = currentType === UserType.CLIENT && !hasClientProfile;
+  const needsFreelancerProfile = currentType === UserType.FREELANCER && !hasFreelancerProfile;
+
+  const identityStatus: IdentityStatus = accountData?.data?.identityStatus || 'UNVERIFIED';
+  const isIdentityVerified = identityStatus === 'VERIFIED';
+  const needsIdentityVerification = identityStatus === 'UNVERIFIED' || identityStatus === 'REJECTED';
 
   return {
     profiles,
@@ -33,7 +42,10 @@ export function useProfileCheck() {
     hasClientProfile,
     needsClientProfile,
     needsFreelancerProfile,
-    isLoading,
-    error,
+    identityStatus,
+    isIdentityVerified,
+    needsIdentityVerification,
+    isLoading: !_hasHydrated || isLoadingProfiles || isLoadingAccount,
+    error: profilesError,
   };
 }

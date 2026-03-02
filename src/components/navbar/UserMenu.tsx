@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserType } from '@/lib/types/auth';
-import { useSwitchAccount } from '@/hooks/useAuth';
+import { useSwitchAccount, useCreateAccount } from '@/hooks/useAuth';
 import { getHomeRoute } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import { HiBriefcase, HiUserGroup, HiUser, HiLogout } from 'react-icons/hi';
+import { HiBriefcase, HiUserGroup, HiUser, HiLogout, HiPlus } from 'react-icons/hi';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +20,7 @@ export function UserMenu() {
   const router = useRouter();
   const { user, clearTokens } = useAuthStore();
 
-  const { mutate: switchAccount, isPending } = useSwitchAccount({
+  const { mutate: switchAccount, isPending: isSwitching } = useSwitchAccount({
     onSuccess: (newUserType) => {
       const roleLabel = newUserType === UserType.CLIENT ? 'Client' : 'Freelancer';
       toast.success(`Switched to ${roleLabel} account`);
@@ -31,6 +31,18 @@ export function UserMenu() {
     },
   });
 
+  const { mutate: createAccount, isPending: isCreating } = useCreateAccount({
+    onSuccess: ({ userType }) => {
+      const roleLabel = userType === UserType.CLIENT ? 'Client' : 'Freelancer';
+      toast.success(`${roleLabel} account created!`);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create account');
+    },
+  });
+
+  const isPending = isSwitching || isCreating;
+
   const handleLogout = () => {
     clearTokens();
     router.push('/login');
@@ -40,6 +52,10 @@ export function UserMenu() {
     if (user?.currentType !== userType) {
       switchAccount(userType);
     }
+  };
+
+  const handleCreateAccount = (userType: UserType) => {
+    createAccount(userType);
   };
 
   return (
@@ -67,35 +83,53 @@ export function UserMenu() {
             <HiUser className="w-4 h-4 mr-2" />
             Profile
           </DropdownMenuItem>
-          {user?.client && user?.freelancer && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Switch Account
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => handleSwitchAccount(UserType.FREELANCER)}
-                disabled={isPending || user?.currentType === UserType.FREELANCER}
-                className="cursor-pointer"
-              >
-                <HiUserGroup className="w-4 h-4 mr-2" />
-                Freelancer
-                {user?.currentType === UserType.FREELANCER && (
-                  <span className="ml-auto text-xs text-primary">Active</span>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleSwitchAccount(UserType.CLIENT)}
-                disabled={isPending || user?.currentType === UserType.CLIENT}
-                className="cursor-pointer"
-              >
-                <HiBriefcase className="w-4 h-4 mr-2" />
-                Client
-                {user?.currentType === UserType.CLIENT && (
-                  <span className="ml-auto text-xs text-primary">Active</span>
-                )}
-              </DropdownMenuItem>
-            </>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel className="text-xs text-muted-foreground">
+            {user?.client && user?.freelancer ? 'Switch Account' : 'Accounts'}
+          </DropdownMenuLabel>
+          {user?.freelancer ? (
+            <DropdownMenuItem
+              onClick={() => handleSwitchAccount(UserType.FREELANCER)}
+              disabled={isPending || user?.currentType === UserType.FREELANCER}
+              className="cursor-pointer"
+            >
+              <HiUserGroup className="w-4 h-4 mr-2" />
+              Freelancer
+              {user?.currentType === UserType.FREELANCER && (
+                <span className="ml-auto text-xs text-primary">Active</span>
+              )}
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() => handleCreateAccount(UserType.FREELANCER)}
+              disabled={isPending}
+              className="cursor-pointer"
+            >
+              <HiPlus className="w-4 h-4 mr-2" />
+              Become Freelancer
+            </DropdownMenuItem>
+          )}
+          {user?.client ? (
+            <DropdownMenuItem
+              onClick={() => handleSwitchAccount(UserType.CLIENT)}
+              disabled={isPending || user?.currentType === UserType.CLIENT}
+              className="cursor-pointer"
+            >
+              <HiBriefcase className="w-4 h-4 mr-2" />
+              Client
+              {user?.currentType === UserType.CLIENT && (
+                <span className="ml-auto text-xs text-primary">Active</span>
+              )}
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() => handleCreateAccount(UserType.CLIENT)}
+              disabled={isPending}
+              className="cursor-pointer"
+            >
+              <HiPlus className="w-4 h-4 mr-2" />
+              Become Client
+            </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">

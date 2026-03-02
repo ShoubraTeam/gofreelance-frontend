@@ -1,12 +1,12 @@
 'use client';
 
-import { useSwitchAccount } from '@/hooks/useAuth';
+import { useSwitchAccount, useCreateAccount } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserType } from '@/lib/types/auth';
 import { getHomeRoute, cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { HiBriefcase, HiUserGroup } from 'react-icons/hi';
+import { HiBriefcase, HiUserGroup, HiPlus } from 'react-icons/hi';
 import {
   Select,
   SelectContent,
@@ -26,7 +26,7 @@ export function AccountSwitcher({
 }: AccountSwitcherProps) {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { mutate: switchAccount, isPending } = useSwitchAccount({
+  const { mutate: switchAccount, isPending: isSwitching } = useSwitchAccount({
     onSuccess: (newUserType) => {
       const roleLabel = newUserType === UserType.CLIENT ? 'Client' : 'Freelancer';
       toast.success(`Switched to ${roleLabel} account`);
@@ -34,6 +34,16 @@ export function AccountSwitcher({
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to switch account');
+    },
+  });
+
+  const { mutate: createAccount, isPending: isCreating } = useCreateAccount({
+    onSuccess: ({ userType }) => {
+      const roleLabel = userType === UserType.CLIENT ? 'Client' : 'Freelancer';
+      toast.success(`${roleLabel} account created! You can now switch to it.`);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create account');
     },
   });
 
@@ -54,6 +64,8 @@ export function AccountSwitcher({
     },
   ];
 
+  const isPending = isSwitching || isCreating;
+
   const handleSwitchAccount = (newUserType: string) => {
     if (newUserType === user.currentType) {
       return;
@@ -61,11 +73,22 @@ export function AccountSwitcher({
     switchAccount(newUserType as UserType);
   };
 
+  const handleCreateAccount = (userType: UserType) => {
+    createAccount(userType);
+  };
+
   if (variant === 'navbar') {
     return (
       <Select
         value={user.currentType}
-        onValueChange={handleSwitchAccount}
+        onValueChange={(value) => {
+          const role = roles.find((r) => r.value === value);
+          if (role?.enabled) {
+            handleSwitchAccount(value);
+          } else if (role) {
+            handleCreateAccount(role.value);
+          }
+        }}
         disabled={isPending}
       >
         <SelectTrigger className={cn('w-[140px] h-8 text-xs', className)} size="sm">
@@ -78,10 +101,19 @@ export function AccountSwitcher({
               <SelectItem
                 key={role.value}
                 value={role.value}
-                disabled={!role.enabled || isPending}
+                disabled={isPending}
               >
-                <Icon className="w-4 h-4" />
-                <span>{role.label}</span>
+                {role.enabled ? (
+                  <>
+                    <Icon className="w-4 h-4" />
+                    <span>{role.label}</span>
+                  </>
+                ) : (
+                  <>
+                    <HiPlus className="w-4 h-4" />
+                    <span>Become {role.label}</span>
+                  </>
+                )}
               </SelectItem>
             );
           })}
@@ -97,22 +129,41 @@ export function AccountSwitcher({
         {roles.map((role) => {
           const Icon = role.icon;
           const isSelected = user.currentType === role.value;
+
+          if (!role.enabled) {
+            return (
+              <button
+                key={role.value}
+                onClick={() => handleCreateAccount(role.value)}
+                disabled={isPending}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all',
+                  'border-dashed border-muted-foreground/50 bg-background hover:border-primary/50 hover:bg-primary/5',
+                  isPending && 'opacity-50 cursor-not-allowed'
+                )}
+              >
+                <HiPlus className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Become {role.label}</span>
+              </button>
+            );
+          }
+
           return (
             <button
               key={role.value}
               onClick={() => handleSwitchAccount(role.value)}
-              disabled={!role.enabled || isPending || isSelected}
+              disabled={isPending || isSelected}
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all',
                 isSelected
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border bg-background hover:border-primary/50',
-                (!role.enabled || isSelected) && 'opacity-50 cursor-not-allowed'
+                isSelected && 'cursor-default'
               )}
             >
               <Icon className="w-4 h-4" />
               <span>{role.label}</span>
-              {isPending && isSelected && (
+              {isSwitching && !isSelected && (
                 <span className="ml-2 text-xs text-muted-foreground">
                   Switching...
                 </span>

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { login, register, switchAccount } from '@/lib/api/auth';
-import type { LoginCredentials, RegisterData, AuthenticationResponse, UserType } from '@/lib/types/auth';
+import { login, register, switchAccount, createClientAccount, createFreelancerAccount, verifyToken } from '@/lib/api/auth';
+import type { LoginCredentials, RegisterData, AuthenticationResponse, User } from '@/lib/types/auth';
+import { UserType } from '@/lib/types/auth';
 import type { ApiResponse } from '@/lib/types/api';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -26,6 +27,33 @@ export function useRegister(options?: {
   });
 }
 
+export function useCreateAccount(options?: {
+  onSuccess?: (result: { userType: UserType; userData: User }) => void;
+  onError?: (error: Error) => void;
+}) {
+  const { setUser } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userType: UserType) => {
+      if (userType === UserType.CLIENT) {
+        await createClientAccount();
+      } else {
+        await createFreelancerAccount();
+      }
+      const userResponse = await verifyToken();
+      return { userType, userData: userResponse.data };
+    },
+    onSuccess: ({ userType, userData }) => {
+      setUser(userData);
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['account'] });
+      options?.onSuccess?.({ userType, userData });
+    },
+    onError: options?.onError,
+  });
+}
+
 export function useSwitchAccount(options?: {
   onSuccess?: (userType: UserType) => void;
   onError?: (error: Error) => void;
@@ -44,6 +72,7 @@ export function useSwitchAccount(options?: {
       }
 
       queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-details'] });
       queryClient.invalidateQueries({ queryKey: ['account'] });
 
       options?.onSuccess?.(userType);
