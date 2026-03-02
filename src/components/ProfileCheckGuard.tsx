@@ -4,37 +4,61 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useProfileCheck } from '@/hooks/useProfileCheck';
 
+const ALLOWED_PATHS_UNVERIFIED = [
+  '/app/identity-verification',
+];
+
 export function ProfileCheckGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { hasProfile, needsClientProfile, needsFreelancerProfile, isLoading } =
-    useProfileCheck();
+  const {
+    hasProfile,
+    needsClientProfile,
+    needsFreelancerProfile,
+    isIdentityVerified,
+    isLoading,
+  } = useProfileCheck();
+
+  const isAllowedPath = ALLOWED_PATHS_UNVERIFIED.some(path => pathname?.startsWith(path));
 
   useEffect(() => {
-    if (pathname?.startsWith('/app/profile/create')) {
+    if (isLoading) {
       return;
     }
 
-    if (isLoading) {
+    if (!isIdentityVerified) {
+      if (!isAllowedPath) {
+        router.push('/app/identity-verification');
+      }
       return;
     }
 
     if (needsClientProfile) {
       router.push('/app/profile/create/client');
-    } else if (needsFreelancerProfile) {
+      return;
+    }
+
+    if (needsFreelancerProfile) {
       router.push('/app/profile/create/freelancer');
+      return;
+    }
+
+    if (isAllowedPath) {
+      router.push('/app/profile');
+      return;
     }
   }, [
     pathname,
     hasProfile,
     needsClientProfile,
     needsFreelancerProfile,
+    isIdentityVerified,
+    isAllowedPath,
     isLoading,
     router,
   ]);
 
-  // Show loading state while checking profile
-  if (isLoading && !pathname?.startsWith('/app/profile/create')) {
+  if (isLoading && !isAllowedPath) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
