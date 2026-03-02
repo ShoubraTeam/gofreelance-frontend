@@ -90,7 +90,7 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
             </div>
           )}
 
-          {!isFreelancer && milestone.status === 'IN_PROGRESS' && (
+          {!isFreelancer && milestone.status === 'NOT_FUNDED' && (
             <div className="ml-auto">
               <Button size="sm" variant="secondary" onClick={() => fund()} disabled={isFunding}>
                 {isFunding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Fund'}
