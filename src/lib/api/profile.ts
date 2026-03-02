@@ -5,8 +5,7 @@ import type {
   CreateFreelancerProfileRequest,
   EditClientProfileRequest,
   EditFreelancerProfileRequest,
-  CreateProfileResponse,
-  EditProfileResponse,
+  ProfileActionResponse,
   SpecializationResponse,
   GetFreelancerProfileDetailsResponse,
   GetClientProfileDetailsResponse,
@@ -16,52 +15,61 @@ import type { ApiResponse } from '../types/api';
 export async function getProfiles(): Promise<
   ApiResponse<GetProfileResponse[]>
 > {
-  return apiClient.get<ApiResponse<GetProfileResponse[]>>('/profile', {
+  return apiClient.get<ApiResponse<GetProfileResponse[]>>('/profiles', {
     requiresAuth: true,
   });
 }
 
+export async function getProfileById(
+  profileId: string
+): Promise<ApiResponse<GetProfileResponse>> {
+  return apiClient.get<ApiResponse<GetProfileResponse>>(
+    `/profiles/${profileId}`,
+    { requiresAuth: true }
+  );
+}
+
 export async function createClientProfile(
   data: CreateClientProfileRequest
-): Promise<ApiResponse<CreateProfileResponse>> {
+): Promise<ApiResponse<ProfileActionResponse>> {
   return apiClient.post<
-    ApiResponse<CreateProfileResponse>,
+    ApiResponse<ProfileActionResponse>,
     CreateClientProfileRequest
-  >('/profile/client', data, { requiresAuth: true });
+  >('/profiles/client', data, { requiresAuth: true });
 }
 
 export async function createFreelancerProfile(
   data: CreateFreelancerProfileRequest
-): Promise<ApiResponse<CreateProfileResponse>> {
+): Promise<ApiResponse<ProfileActionResponse>> {
   return apiClient.post<
-    ApiResponse<CreateProfileResponse>,
+    ApiResponse<ProfileActionResponse>,
     CreateFreelancerProfileRequest
-  >('/profile/freelancer', data, { requiresAuth: true });
+  >('/profiles/freelancer', data, { requiresAuth: true });
 }
 
 export async function editClientProfile(
   data: EditClientProfileRequest
-): Promise<ApiResponse<EditProfileResponse>> {
+): Promise<ApiResponse<ProfileActionResponse>> {
   return apiClient.patch<
-    ApiResponse<EditProfileResponse>,
+    ApiResponse<ProfileActionResponse>,
     EditClientProfileRequest
-  >('/profile/client', data, { requiresAuth: true });
+  >('/profiles/client', data, { requiresAuth: true });
 }
 
 export async function editFreelancerProfile(
   data: EditFreelancerProfileRequest
-): Promise<ApiResponse<EditProfileResponse>> {
+): Promise<ApiResponse<ProfileActionResponse>> {
   return apiClient.patch<
-    ApiResponse<EditProfileResponse>,
+    ApiResponse<ProfileActionResponse>,
     EditFreelancerProfileRequest
-  >('/profile/freelancer', data, { requiresAuth: true });
+  >('/profiles/freelancer', data, { requiresAuth: true });
 }
 
 export async function getFreelancerProfileDetails(
   profileId: string
 ): Promise<ApiResponse<GetFreelancerProfileDetailsResponse>> {
   return apiClient.get<ApiResponse<GetFreelancerProfileDetailsResponse>>(
-    `/profile/freelancer/${profileId}`,
+    `/profiles/freelancer/${profileId}`,
     { requiresAuth: true }
   );
 }
@@ -70,7 +78,7 @@ export async function getClientProfileDetails(
   profileId: string
 ): Promise<ApiResponse<GetClientProfileDetailsResponse>> {
   return apiClient.get<ApiResponse<GetClientProfileDetailsResponse>>(
-    `/profile/client/${profileId}`,
+    `/profiles/client/${profileId}`,
     { requiresAuth: true }
   );
 }
@@ -79,7 +87,7 @@ export async function getSpecializations(): Promise<
   ApiResponse<SpecializationResponse[]>
 > {
   return apiClient.get<ApiResponse<SpecializationResponse[]>>(
-    '/profile/freelancer/specialization',
+    '/profiles/freelancer/specialization',
     { requiresAuth: true }
   );
 }
@@ -88,7 +96,7 @@ export async function getAllSkills(): Promise<
   ApiResponse<import('../types/profile').Skill[]>
 > {
   return apiClient.get<ApiResponse<import('../types/profile').Skill[]>>(
-    '/profile/freelancer/skills',
+    '/profiles/freelancer/skills',
     { requiresAuth: true }
   );
 }
@@ -99,14 +107,14 @@ export async function addSkills(
   return apiClient.post<
     ApiResponse<{ profileId: string }>,
     import('../types/profile').SkillsRequest
-  >('/profile/freelancer/skills', data, { requiresAuth: true });
+  >('/profiles/freelancer/skills', data, { requiresAuth: true });
 }
 
 export async function deleteSkills(
   data: import('../types/profile').SkillsRequest
 ): Promise<ApiResponse<{ profileId: string }>> {
   return apiClient.delete<ApiResponse<{ profileId: string }>>(
-    '/profile/freelancer/skills',
+    '/profiles/freelancer/skills',
     { requiresAuth: true, body: JSON.stringify(data) }
   );
 }
@@ -117,7 +125,7 @@ export async function addWorkExperience(
   return apiClient.post<
     ApiResponse<{ profileId: string; workedAt: string }>,
     import('../types/profile').WorkExperienceRequest
-  >('/profile/freelancer/work-experience', data, { requiresAuth: true });
+  >('/profiles/freelancer/work-experience', data, { requiresAuth: true });
 }
 
 export async function editWorkExperience(
@@ -126,7 +134,7 @@ export async function editWorkExperience(
   return apiClient.patch<
     ApiResponse<{ profileId: string; workedAt: string }>,
     import('../types/profile').WorkExperienceRequest
-  >('/profile/freelancer/work-experience', data, { requiresAuth: true });
+  >('/profiles/freelancer/work-experience', data, { requiresAuth: true });
 }
 
 export async function deleteWorkExperience(
@@ -135,7 +143,7 @@ export async function deleteWorkExperience(
 ): Promise<ApiResponse<{ profileId: string; workedAt: string }>> {
   return apiClient.delete<
     ApiResponse<{ profileId: string; workedAt: string }>
-  >(`/profile/freelancer/work-experience/${profileId}/${workedAt}`, {
+  >(`/profiles/freelancer/work-experience/${profileId}/${workedAt}`, {
     requiresAuth: true,
   });
 }
@@ -146,7 +154,7 @@ export async function addProject(
   return apiClient.post<
     ApiResponse<{ profileId: string; title: string }>,
     import('../types/profile').ProjectRequest
-  >('/profile/freelancer/projects', data, { requiresAuth: true });
+  >('/profiles/freelancer/projects', data, { requiresAuth: true });
 }
 
 export async function editProject(
@@ -155,7 +163,7 @@ export async function editProject(
   return apiClient.patch<
     ApiResponse<{ profileId: string; title: string }>,
     import('../types/profile').ProjectRequest
-  >('/profile/freelancer/projects', data, { requiresAuth: true });
+  >('/profiles/freelancer/projects', data, { requiresAuth: true });
 }
 
 export async function deleteProject(
@@ -163,7 +171,7 @@ export async function deleteProject(
   projectTitle: string
 ): Promise<ApiResponse<{ profileId: string; title: string }>> {
   return apiClient.delete<ApiResponse<{ profileId: string; title: string }>>(
-    `/profile/freelancer/projects/${profileId}/${encodeURIComponent(projectTitle)}`,
+    `/profiles/freelancer/projects/${profileId}/${encodeURIComponent(projectTitle)}`,
     { requiresAuth: true }
   );
 }
@@ -174,7 +182,7 @@ export async function addCertificate(
   return apiClient.post<
     ApiResponse<{ certificateId: string; name: string }>,
     import('../types/profile').CertificateRequest
-  >('/profile/freelancer/certificates', data, { requiresAuth: true });
+  >('/profiles/freelancer/certificates', data, { requiresAuth: true });
 }
 
 export async function editCertificate(
@@ -183,7 +191,7 @@ export async function editCertificate(
   return apiClient.patch<
     ApiResponse<{ certificateId: string; name: string }>,
     import('../types/profile').CertificateRequest
-  >('/profile/freelancer/certificates', data, { requiresAuth: true });
+  >('/profiles/freelancer/certificates', data, { requiresAuth: true });
 }
 
 export async function deleteCertificate(
@@ -193,7 +201,7 @@ export async function deleteCertificate(
   return apiClient.delete<
     ApiResponse<{ certificateId: string; name: string }>
   >(
-    `/profile/freelancer/certificates/${profileId}/${encodeURIComponent(certificateName)}`,
+    `/profiles/freelancer/certificates/${profileId}/${encodeURIComponent(certificateName)}`,
     { requiresAuth: true }
   );
 }

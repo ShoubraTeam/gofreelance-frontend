@@ -43,7 +43,7 @@ export async function verifyToken(): Promise<ApiResponse<User>> {
 }
 
 export async function getAccountInfo(): Promise<ApiResponse<AccountInfo>> {
-  return apiClient.get<ApiResponse<AccountInfo>>('/me/info', {
+  return apiClient.get<ApiResponse<AccountInfo>>('/me', {
     requiresAuth: true,
   });
 }
@@ -56,4 +56,16 @@ export async function switchAccount(
     { userType },
     { requiresAuth: true }
   );
+}
+
+export async function createClientAccount(): Promise<ApiResponse<void>> {
+  return apiClient.post<ApiResponse<void>>('/me/client', undefined, {
+    requiresAuth: true,
+  });
+}
+
+export async function createFreelancerAccount(): Promise<ApiResponse<void>> {
+  return apiClient.post<ApiResponse<void>>('/me/freelancer', undefined, {
+    requiresAuth: true,
+  });
 }

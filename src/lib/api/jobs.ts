@@ -1,6 +1,7 @@
 import { apiClient } from './client';
 import type { ApiResponse } from '../types/api';
-import type { NewJobRequest, JobResponse, UpdateJobRequest } from '../types/job';
+import type { NewJobRequest, JobResponse, UpdateJobRequest, JobsPage } from '../types/job';
+import type { ProposalsPage } from '../types/proposal';
 
 export async function createJob(
   data: NewJobRequest
@@ -16,7 +17,7 @@ export async function getClientJobs(
   clientId: string
 ): Promise<ApiResponse<JobResponse[]>> {
   return apiClient.get<ApiResponse<JobResponse[]>>(
-    `/jobs/client?id=${clientId}`,
+    `/jobs/client/${clientId}`,
     { requiresAuth: true }
   );
 }
@@ -31,15 +32,26 @@ export async function updateJob(
   );
 }
 
-export async function getPublicJobs(page = 0): Promise<ApiResponse<JobResponse[]>> {
+export async function getPublicJobs(page = 0): Promise<ApiResponse<JobsPage>> {
   const params = new URLSearchParams({
     'page': page.toString(),
     'size': '10',
   });
 
-  return apiClient.get<ApiResponse<JobResponse[]>>(
+  return apiClient.get<ApiResponse<JobsPage>>(
     `/jobs/public?${params.toString()}`,
     { requiresAuth: false }
+  );
+}
+
+export async function getJobProposals(
+  jobId: string,
+  page = 0,
+  size = 10
+): Promise<ApiResponse<ProposalsPage>> {
+  return apiClient.get<ApiResponse<ProposalsPage>>(
+    `/jobs/${jobId}/proposals?page=${page}&size=${size}`,
+    { requiresAuth: true }
   );
 }
 

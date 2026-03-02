@@ -3,6 +3,7 @@ export type SpecializationStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface GetProfileResponse {
   id: string;
+  title: string;
   bio: string;
   averageRatings: number;
   numberOfRatings: number;
@@ -34,11 +35,7 @@ export interface EditFreelancerProfileRequest {
   bio?: string;
 }
 
-export interface CreateProfileResponse {
-  profileId: string;
-}
-
-export interface EditProfileResponse {
+export interface ProfileActionResponse {
   profileId: string;
 }
 
