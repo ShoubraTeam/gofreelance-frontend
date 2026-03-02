@@ -1,18 +1,11 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { FiEdit2, FiPlus } from 'react-icons/fi';
 import { WorkExperienceDialog } from '@/components/profile/WorkExperienceDialog';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
+import { ProfileEmptyState } from '../ProfileEmptyState';
+import { ProfileSectionCard } from '../ProfileSectionCard';
 import { deleteWorkExperience } from '@/lib/api/profile';
 import type {
   GetFreelancerProfileDetailsResponse,
@@ -81,14 +74,11 @@ export function ProfileWorkExperienceSection({
 
   return (
     <>
-      <div className="bg-white border border-border rounded-sm p-6 shadow-none">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Work Experience</h2>
-          <Button variant="ghost" size="icon" onClick={handleAdd}>
-            <FiPlus className="w-7 h-7" />
-          </Button>
-        </div>
-
+      <ProfileSectionCard
+        title="Work Experience"
+        actionIcon={FiPlus}
+        onAction={handleAdd}
+      >
         {profile.workExperiences.length > 0 ? (
           <div className="space-y-4">
             {profile.workExperiences.map((exp, index) => (
@@ -120,21 +110,13 @@ export function ProfileWorkExperienceSection({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground text-sm">
-              No work experience yet
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-4"
-              onClick={handleAdd}
-            >
-              Add work experience
-            </Button>
-          </div>
+          <ProfileEmptyState
+            message="No work experience yet"
+            actionLabel="Add work experience"
+            onAction={handleAdd}
+          />
         )}
-      </div>
+      </ProfileSectionCard>
 
       <WorkExperienceDialog
         open={dialogOpen}
@@ -152,26 +134,13 @@ export function ProfileWorkExperienceSection({
         }
       />
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Work Experience</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this work experience? This action
-              cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Work Experience"
+        description="Are you sure you want to delete this work experience? This action cannot be undone."
+        onConfirm={confirmDelete}
+      />
     </>
   );
 }

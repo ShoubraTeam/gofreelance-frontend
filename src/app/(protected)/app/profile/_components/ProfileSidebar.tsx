@@ -34,12 +34,13 @@ export function ProfileSidebar({ profiles, selectedProfileId, onProfileSelect }:
 
   const profileDetailsQueries = useQueries({
     queries: currentProfiles.map((profile) => ({
-      queryKey: ['profile-details', profile.id],
+      queryKey: ['profile-details', profile.id, isFreelancer ? 'freelancer' : 'client'],
       queryFn: () =>
         isFreelancer
           ? getFreelancerProfileDetails(profile.id)
           : getClientProfileDetails(profile.id),
       enabled: currentProfiles.length > 0,
+      staleTime: 5 * 60 * 1000,
     })),
   });
 

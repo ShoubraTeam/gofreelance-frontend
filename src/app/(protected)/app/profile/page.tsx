@@ -34,19 +34,23 @@ export default function ProfilePage() {
 
   const profiles = useMemo(() => profilesData?.data || [], [profilesData?.data]);
 
-  // Initialize selected profile when profiles are loaded - this is intentional
+  // Reset selected profile when user type changes
   useEffect(() => {
-    if (!selectedProfileId && profiles.length > 0 && user) {
+    if (profiles.length > 0 && user) {
       const isFreelancer = user.currentType === UserType.FREELANCER;
       const currentTypeProfiles = profiles.filter(
         (p) => p.profileType === (isFreelancer ? 'FREELANCER' : 'CLIENT')
       );
-      if (currentTypeProfiles.length > 0) {
+      const currentSelectedProfile = profiles.find((p) => p.id === selectedProfileId);
+      const isSelectedProfileWrongType = currentSelectedProfile &&
+        currentSelectedProfile.profileType !== (isFreelancer ? 'FREELANCER' : 'CLIENT');
+
+      if ((!selectedProfileId || isSelectedProfileWrongType) && currentTypeProfiles.length > 0) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedProfileId(currentTypeProfiles[0].id);
       }
     }
-  }, [profiles.length, selectedProfileId, user]);
+  }, [profiles, selectedProfileId, user?.currentType]);
 
   if (isLoadingAccount || isLoadingProfiles) {
     return (

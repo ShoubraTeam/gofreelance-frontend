@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { GetProfileResponse, GetFreelancerProfileDetailsResponse } from '@/lib/types/profile';
+import type { GetProfileResponse } from '@/lib/types/profile';
 import Link from 'next/link';
 import { getFreelancerProfileDetails, getClientProfileDetails } from '@/lib/api/profile';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -35,7 +35,7 @@ export function ProfileMainContent({
     isLoading: isLoadingFreelancer,
     refetch: refetchFreelancer,
   } = useQuery({
-    queryKey: ['profile-details', currentProfile?.id],
+    queryKey: ['profile-details', currentProfile?.id, 'freelancer'],
     queryFn: () => getFreelancerProfileDetails(currentProfile!.id),
     enabled: !!currentProfile && isFreelancer,
   });
@@ -45,14 +45,12 @@ export function ProfileMainContent({
     isLoading: isLoadingClient,
     refetch: refetchClient,
   } = useQuery({
-    queryKey: ['profile-details', currentProfile?.id],
+    queryKey: ['profile-details', currentProfile?.id, 'client'],
     queryFn: () => getClientProfileDetails(currentProfile!.id),
     enabled: !!currentProfile && !isFreelancer,
   });
 
   const isLoading = isLoadingFreelancer || isLoadingClient;
-  const detailsData = isFreelancer ? freelancerDetailsData : clientDetailsData;
-  const refetch = isFreelancer ? refetchFreelancer : refetchClient;
 
   if (!currentProfile) {
     return (
@@ -82,25 +80,25 @@ export function ProfileMainContent({
     );
   }
 
-  const profile = detailsData?.data;
-  if (!profile) return null;
-
   if (isFreelancer) {
-    const freelancerProfile = profile as GetFreelancerProfileDetailsResponse;
+    const freelancerProfile = freelancerDetailsData?.data;
+    if (!freelancerProfile) return null;
     return (
       <div className="space-y-4">
-        <ProfileBioSection profile={freelancerProfile} onUpdate={refetch} />
-        <ProfileSkillsSection profile={freelancerProfile} onUpdate={refetch} />
-        <ProfileWorkExperienceSection profile={freelancerProfile} onUpdate={refetch} />
-        <ProfilePortfolioSection profile={freelancerProfile} onUpdate={refetch} />
-        <ProfileCertificationsSection profile={freelancerProfile} onUpdate={refetch} />
+        <ProfileBioSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
+        <ProfileSkillsSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
+        <ProfileWorkExperienceSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
+        <ProfilePortfolioSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
+        <ProfileCertificationsSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
       </div>
     );
   }
 
+  const clientProfile = clientDetailsData?.data;
+  if (!clientProfile) return null;
   return (
     <div className="space-y-4">
-      <ProfileBioSection profile={profile} onUpdate={refetch} />
+      <ProfileBioSection profile={clientProfile} onUpdate={refetchClient} />
     </div>
   );
 }
