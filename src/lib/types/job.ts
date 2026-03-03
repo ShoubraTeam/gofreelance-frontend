@@ -28,6 +28,7 @@ export interface JobResponse {
   jobType: JobType;
   createdAt: string;
   jobStatus: JobStatus;
+  proposalCount: number;
 }
 
 export interface UpdateJobRequest {
