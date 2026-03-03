@@ -76,3 +76,19 @@ export async function fundMilestone(
     { requiresAuth: true }
   );
 }
+
+export interface EditMilestoneRequest {
+  content?: string;
+  price?: number;
+}
+
+export async function editMilestone(
+  milestoneId: string,
+  data: EditMilestoneRequest
+): Promise<ApiResponse<MilestoneResponse>> {
+  return apiClient.patch<ApiResponse<MilestoneResponse>, EditMilestoneRequest>(
+    `/milestones/${milestoneId}`,
+    data,
+    { requiresAuth: true }
+  );
+}

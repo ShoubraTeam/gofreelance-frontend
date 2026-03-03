@@ -1,23 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { MilestoneResponse, MilestoneStatus } from '@/lib/types/contract';
+import { STATUS_COLORS } from '@/lib/constants/statusStyles';
 import { acceptMilestone, fundMilestone } from '@/lib/api/contracts';
 import { capitalize } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FiDollarSign, FiCalendar } from 'react-icons/fi';
+import { FiDollarSign, FiCalendar, FiEdit2 } from 'react-icons/fi';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { EditMilestoneDialog } from './EditMilestoneDialog';
 
 const STATUS_STYLES: Record<MilestoneStatus, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  NOT_FUNDED: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  UNDER_REVIEW: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  COMPLETED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  REJECTED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  PENDING: STATUS_COLORS.pending,
+  NOT_FUNDED: STATUS_COLORS.neutral,
+  IN_PROGRESS: STATUS_COLORS.info,
+  UNDER_REVIEW: STATUS_COLORS.purple,
+  COMPLETED: STATUS_COLORS.success,
+  REJECTED: STATUS_COLORS.rejected,
 };
 
 interface MilestoneCardProps {
@@ -28,6 +31,7 @@ interface MilestoneCardProps {
 
 export function MilestoneCard({ milestone, contractId, isFreelancer }: MilestoneCardProps) {
   const queryClient = useQueryClient();
+  const [editOpen, setEditOpen] = useState(false);
 
   const { mutate: accept, isPending: isAccepting } = useMutation({
     mutationFn: () => acceptMilestone(milestone.id),
@@ -97,8 +101,24 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
               </Button>
             </div>
           )}
+
+          {!isFreelancer && milestone.status === 'PENDING' && (
+            <div className="ml-auto">
+              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                <FiEdit2 className="w-3.5 h-3.5 mr-1.5" />
+                Edit
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
+
+      <EditMilestoneDialog
+        milestone={milestone}
+        contractId={contractId}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
     </Card>
   );
 }
