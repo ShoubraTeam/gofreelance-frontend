@@ -14,8 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { addCertificate, editCertificate } from '@/lib/api/profile';
+import { createSaveHandlers } from '@/lib/utils';
 import type { CertificateDetail } from '@/lib/types/profile';
-import toast from 'react-hot-toast';
 
 interface CertificateDialogProps {
   open: boolean;
@@ -37,12 +37,9 @@ export function CertificateDialog({
   const [name, setName] = useState(certificate?.name || '');
   const [imageUrl, setImageUrl] = useState(certificate?.imageUrl || '');
 
-  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
-       
       setName(certificate?.name || '');
-       
       setImageUrl(certificate?.imageUrl || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,16 +47,7 @@ export function CertificateDialog({
 
   const { mutate, isPending } = useMutation({
     mutationFn: certificate ? editCertificate : addCertificate,
-    onSuccess: () => {
-      toast.success(
-        `Certificate ${certificate ? 'updated' : 'added'} successfully`
-      );
-      onOpenChange(false);
-      onSuccess();
-    },
-    onError: () => {
-      toast.error('Failed to save certificate');
-    },
+    ...createSaveHandlers('Certificate', !!certificate, onOpenChange, onSuccess),
   });
 
   const handleSubmit = (e: React.FormEvent) => {

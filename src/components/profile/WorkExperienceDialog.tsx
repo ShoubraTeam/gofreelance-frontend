@@ -14,8 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { addWorkExperience, editWorkExperience } from '@/lib/api/profile';
+import { createSaveHandlers } from '@/lib/utils';
 import type { WorkExperienceDetail } from '@/lib/types/profile';
-import toast from 'react-hot-toast';
 
 interface WorkExperienceDialogProps {
   open: boolean;
@@ -39,16 +39,11 @@ export function WorkExperienceDialog({
   const [startedAt, setStartedAt] = useState(experience?.startedAt || '');
   const [endedAt, setEndedAt] = useState(experience?.endedAt || '');
 
-  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
-       
       setWorkAt(experience?.workedAt || '');
-       
       setJobTitle(experience?.jobTitle || '');
-       
       setStartedAt(experience?.startedAt || '');
-       
       setEndedAt(experience?.endedAt || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,16 +51,7 @@ export function WorkExperienceDialog({
 
   const { mutate, isPending } = useMutation({
     mutationFn: experience ? editWorkExperience : addWorkExperience,
-    onSuccess: () => {
-      toast.success(
-        `Work experience ${experience ? 'updated' : 'added'} successfully`
-      );
-      onOpenChange(false);
-      onSuccess();
-    },
-    onError: () => {
-      toast.error('Failed to save work experience');
-    },
+    ...createSaveHandlers('Work experience', !!experience, onOpenChange, onSuccess),
   });
 
   const handleSubmit = (e: React.FormEvent) => {

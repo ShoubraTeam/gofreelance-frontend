@@ -17,12 +17,13 @@ export function ProfileCheckGuard({ children }: { children: React.ReactNode }) {
     needsFreelancerProfile,
     isIdentityVerified,
     isLoading,
+    hasData,
   } = useProfileCheck();
 
   const isAllowedPath = ALLOWED_PATHS_UNVERIFIED.some(path => pathname?.startsWith(path));
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || !hasData) {
       return;
     }
 
@@ -55,6 +56,7 @@ export function ProfileCheckGuard({ children }: { children: React.ReactNode }) {
     isIdentityVerified,
     isAllowedPath,
     isLoading,
+    hasData,
     router,
   ]);
 

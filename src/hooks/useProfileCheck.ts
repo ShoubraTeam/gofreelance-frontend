@@ -36,6 +36,8 @@ export function useProfileCheck() {
   const isIdentityVerified = identityStatus === 'VERIFIED';
   const needsIdentityVerification = identityStatus === 'UNVERIFIED' || identityStatus === 'REJECTED';
 
+  const hasData = !isAuthenticated || (profilesData !== undefined && accountData !== undefined);
+
   return {
     profiles,
     hasProfile,
@@ -46,6 +48,7 @@ export function useProfileCheck() {
     isIdentityVerified,
     needsIdentityVerification,
     isLoading: !_hasHydrated || isLoadingProfiles || isLoadingAccount,
+    hasData,
     error: profilesError,
   };
 }

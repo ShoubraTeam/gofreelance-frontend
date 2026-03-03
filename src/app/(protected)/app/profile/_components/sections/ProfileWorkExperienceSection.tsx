@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { FiEdit2, FiPlus } from 'react-icons/fi';
@@ -6,6 +5,7 @@ import { WorkExperienceDialog } from '@/components/profile/WorkExperienceDialog'
 import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 import { ProfileEmptyState } from '../ProfileEmptyState';
 import { ProfileSectionCard } from '../ProfileSectionCard';
+import { useItemManager } from '@/hooks/useItemManager';
 import { deleteWorkExperience } from '@/lib/api/profile';
 import type {
   GetFreelancerProfileDetailsResponse,
@@ -22,16 +22,8 @@ export function ProfileWorkExperienceSection({
   profile,
   onUpdate,
 }: ProfileWorkExperienceSectionProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [expToDelete, setExpToDelete] = useState<string | null>(null);
-  const [selectedExp, setSelectedExp] = useState<
-    WorkExperienceDetail | undefined
-  >();
-
   const { mutate: removeWorkExp } = useMutation({
-    mutationFn: ({ workedAt }: { workedAt: string }) =>
-      deleteWorkExperience(profile.id, workedAt),
+    mutationFn: (workedAt: string) => deleteWorkExperience(profile.id, workedAt),
     onSuccess: () => {
       toast.success('Work experience deleted');
       onUpdate();
@@ -41,28 +33,17 @@ export function ProfileWorkExperienceSection({
     },
   });
 
-  const handleEdit = (exp: WorkExperienceDetail) => {
-    setSelectedExp(exp);
-    setDialogOpen(true);
-  };
-
-  const handleAdd = () => {
-    setSelectedExp(undefined);
-    setDialogOpen(true);
-  };
-
-  const handleDelete = (workedAt: string) => {
-    setExpToDelete(workedAt);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (expToDelete) {
-      removeWorkExp({ workedAt: expToDelete });
-      setDeleteDialogOpen(false);
-      setExpToDelete(null);
-    }
-  };
+  const {
+    dialogOpen,
+    setDialogOpen,
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+    selectedItem: selectedExp,
+    handleEdit,
+    handleAdd,
+    handleDelete,
+    confirmDelete,
+  } = useItemManager<WorkExperienceDetail>((workedAt) => removeWorkExp(workedAt));
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

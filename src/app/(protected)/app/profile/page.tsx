@@ -75,7 +75,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="max-w-7xl mx-auto px-6 pb-12 pt-20">
-        {account && <ProfilePageHeader account={account} />}
+        {account && <ProfilePageHeader account={account} selectedProfileId={selectedProfileId} />}
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4">

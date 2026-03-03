@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import type { AccountInfo } from '@/lib/types/auth';
+import { UserType } from '@/lib/types/auth';
 import {
   FiCheckCircle,
   FiShare2,
@@ -16,9 +17,10 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 interface ProfilePageHeaderProps {
   account: AccountInfo;
+  selectedProfileId: string | null;
 }
 
-export function ProfilePageHeader({ account }: ProfilePageHeaderProps) {
+export function ProfilePageHeader({ account, selectedProfileId }: ProfilePageHeaderProps) {
   const router = useRouter();
   const { user } = useAuthStore();
 
@@ -33,7 +35,11 @@ export function ProfilePageHeader({ account }: ProfilePageHeaderProps) {
   };
 
   const handleViewPublic = () => {
-    const publicProfileUrl = `/profile/public/${user?.id}`;
+    if (!selectedProfileId) return;
+    const isClient = user?.currentType === UserType.CLIENT;
+    const publicProfileUrl = isClient
+      ? `/profile/public/client/${selectedProfileId}`
+      : `/profile/public/${selectedProfileId}`;
     window.open(publicProfileUrl, '_blank');
   };
 

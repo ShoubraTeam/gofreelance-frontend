@@ -15,8 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { addProject, editProject } from '@/lib/api/profile';
+import { createSaveHandlers } from '@/lib/utils';
 import type { ProjectDetail } from '@/lib/types/profile';
-import toast from 'react-hot-toast';
 
 interface ProjectDialogProps {
   open: boolean;
@@ -41,18 +41,12 @@ export function ProjectDialog({
   const [projectUrl, setProjectUrl] = useState(project?.projectUrl || '');
   const [fileUrl, setFileUrl] = useState(project?.fileUrl || '');
 
-  // Reset form state when dialog opens - this is intentional and safe
   useEffect(() => {
     if (open) {
-       
       setTitle(project?.title || '');
-       
       setContent(project?.content || '');
-       
       setImageUrl(project?.imageUrl || '');
-       
       setProjectUrl(project?.projectUrl || '');
-       
       setFileUrl(project?.fileUrl || '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,14 +54,7 @@ export function ProjectDialog({
 
   const { mutate, isPending } = useMutation({
     mutationFn: project ? editProject : addProject,
-    onSuccess: () => {
-      toast.success(`Project ${project ? 'updated' : 'added'} successfully`);
-      onOpenChange(false);
-      onSuccess();
-    },
-    onError: () => {
-      toast.error('Failed to save project');
-    },
+    ...createSaveHandlers('Project', !!project, onOpenChange, onSuccess),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
