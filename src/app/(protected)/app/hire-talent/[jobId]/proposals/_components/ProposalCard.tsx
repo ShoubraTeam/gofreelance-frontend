@@ -3,7 +3,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import type { ProposalResponse } from '@/lib/types/proposal';
+import type { ProposalResponse, ProposalStatus } from '@/lib/types/proposal';
+import { STATUS_COLORS } from '@/lib/constants/statusStyles';
 import { createContract } from '@/lib/api/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -11,10 +12,10 @@ import { FiDollarSign, FiClock, FiCalendar, FiUser, FiStar } from 'react-icons/f
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const STATUS_STYLES: Record<ProposalResponse['status'], string> = {
-  PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  ACCEPTED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  REJECTED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+const STATUS_STYLES: Record<ProposalStatus, string> = {
+  PENDING: STATUS_COLORS.pending,
+  ACCEPTED: STATUS_COLORS.success,
+  REJECTED: STATUS_COLORS.rejected,
 };
 
 interface ProposalCardProps {
@@ -28,9 +29,10 @@ export function ProposalCard({ proposal }: ProposalCardProps) {
 
   const { mutate: accept, isPending } = useMutation({
     mutationFn: () => createContract(proposal.id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success('Proposal accepted! Contract created.');
       queryClient.invalidateQueries({ queryKey: ['job-proposals'] });
+      router.push(`/app/contracts/${response.data.contractId}`);
     },
     onError: () => {
       toast.error('Failed to accept proposal. Please try again.');

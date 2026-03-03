@@ -8,6 +8,7 @@ interface JobHeaderProps {
   jobPrice: number;
   experienceLevel: string;
   createdAt: string;
+  proposalCount: number;
 }
 
 export function JobHeader({
@@ -16,6 +17,7 @@ export function JobHeader({
   jobPrice,
   experienceLevel,
   createdAt,
+  proposalCount,
 }: JobHeaderProps) {
   return (
     <div className="mb-6">
@@ -49,6 +51,11 @@ export function JobHeader({
           <span className="font-semibold">
             {capitalize(experienceLevel)}
           </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <FiUsers className="w-5 h-5 text-primary" />
+          <span className="text-muted-foreground">Proposals:</span>
+          <span className="font-semibold">{proposalCount}</span>
         </div>
         <div className="flex items-center gap-2">
           <FiCalendar className="w-5 h-5 text-primary" />

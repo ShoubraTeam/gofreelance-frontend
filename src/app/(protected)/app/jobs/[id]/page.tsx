@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiErrorMessage } from '@/lib/utils';
 import { getJobById } from '@/lib/api/jobs';
 import { createProposal, getMyProposals, editProposal, deleteProposal } from '@/lib/api/proposals';
 import { getProfiles } from '@/lib/api/profile';
@@ -55,10 +56,10 @@ export default function JobDetailsPage() {
       setProposalPrice('');
       setProposalHours('');
       queryClient.invalidateQueries({ queryKey: ['my-proposals'] });
+      queryClient.invalidateQueries({ queryKey: ['job', jobId] });
     },
     onError: (error: unknown) => {
-      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to submit proposal';
-      toast.error(errorMessage);
+      toast.error(getApiErrorMessage(error, 'Failed to submit proposal'));
     },
   });
 
@@ -71,8 +72,7 @@ export default function JobDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ['my-proposals'] });
     },
     onError: (error: unknown) => {
-      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to update proposal';
-      toast.error(errorMessage);
+      toast.error(getApiErrorMessage(error, 'Failed to update proposal'));
     },
   });
 
@@ -83,8 +83,7 @@ export default function JobDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ['my-proposals'] });
     },
     onError: (error: unknown) => {
-      const errorMessage = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to withdraw proposal';
-      toast.error(errorMessage);
+      toast.error(getApiErrorMessage(error, 'Failed to withdraw proposal'));
     },
   });
 
@@ -184,6 +183,7 @@ export default function JobDetailsPage() {
               jobPrice={job.jobPrice}
               experienceLevel={job.experienceLevel}
               createdAt={job.createdAt}
+              proposalCount={job.proposalCount}
             />
 
             <Separator className="my-6" />
