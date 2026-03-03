@@ -16,6 +16,7 @@ import {
   FiArrowLeft,
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import { PublicProfileSection } from '../_components/PublicProfileSection';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -83,83 +84,78 @@ export default function PublicProfilePage({ params }: PageProps) {
           )}
         </Card>
 
-        <>
-          {freelancerDetails.skills?.length > 0 && (
-            <Card className="bg-white border border-border rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <FiBriefcase className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold">Skills</h2>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {freelancerDetails.skills.map((skill) => (
-                  <Badge key={skill.id} variant="outline" className="px-3 py-1.5 text-sm">
-                    {skill.name}
-                  </Badge>
-                ))}
-              </div>
-            </Card>
-          )}
+        {freelancerDetails.skills?.length > 0 && (
+          <PublicProfileSection
+            icon={<FiBriefcase className="w-5 h-5 text-primary" />}
+            title="Skills"
+          >
+            <div className="flex flex-wrap gap-2">
+              {freelancerDetails.skills.map((skill) => (
+                <Badge key={skill.id} variant="outline" className="px-3 py-1.5 text-sm">
+                  {skill.name}
+                </Badge>
+              ))}
+            </div>
+          </PublicProfileSection>
+        )}
 
-          {freelancerDetails.workExperiences.length > 0 && (
-            <Card className="bg-white border border-border rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <FiBriefcase className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold">Work Experience</h2>
-              </div>
-              <div className="space-y-4">
-                {freelancerDetails.workExperiences.map((exp, index) => (
-                  <div key={index} className="border-l-2 border-primary/20 pl-4">
-                    <h3 className="font-semibold">{exp.jobTitle || 'Position'}</h3>
-                    <p className="text-sm text-muted-foreground">{exp.workedAt}</p>
-                    {exp.startedAt && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {exp.startedAt} — {exp.endedAt || 'Present'}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+        {freelancerDetails.workExperiences.length > 0 && (
+          <PublicProfileSection
+            icon={<FiBriefcase className="w-5 h-5 text-primary" />}
+            title="Work Experience"
+          >
+            <div className="space-y-4">
+              {freelancerDetails.workExperiences.map((exp, index) => (
+                <div key={index} className="border-l-2 border-primary/20 pl-4">
+                  <h3 className="font-semibold">{exp.jobTitle || 'Position'}</h3>
+                  <p className="text-sm text-muted-foreground">{exp.workedAt}</p>
+                  {exp.startedAt && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {exp.startedAt} — {exp.endedAt || 'Present'}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </PublicProfileSection>
+        )}
 
-          {freelancerDetails.projects.length > 0 && (
-            <Card className="bg-white border border-border rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <FiFolder className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold">Portfolio</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {freelancerDetails.projects.map((project, index) => (
-                  <div key={index} className="border border-border rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">{project.title}</h3>
-                    {project.content && (
-                      <p className="text-sm text-muted-foreground">{project.content}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+        {freelancerDetails.projects.length > 0 && (
+          <PublicProfileSection
+            icon={<FiFolder className="w-5 h-5 text-primary" />}
+            title="Portfolio"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {freelancerDetails.projects.map((project, index) => (
+                <div key={index} className="border border-border rounded-lg p-4">
+                  <h3 className="font-semibold mb-2">{project.title}</h3>
+                  {project.content && (
+                    <p className="text-sm text-muted-foreground">{project.content}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </PublicProfileSection>
+        )}
 
-          {freelancerDetails.certificates.length > 0 && (
-            <Card className="bg-white border border-border rounded-xl shadow-sm p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <FiAward className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold">Certifications</h2>
-              </div>
-              <div className="space-y-3">
-                {freelancerDetails.certificates.map((cert, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                      <FiAward className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="font-medium">{cert.name}</span>
+        {freelancerDetails.certificates.length > 0 && (
+          <PublicProfileSection
+            icon={<FiAward className="w-5 h-5 text-primary" />}
+            title="Certifications"
+            isLast
+          >
+            <div className="space-y-3">
+              {freelancerDetails.certificates.map((cert, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <FiAward className="w-5 h-5 text-primary" />
                   </div>
-                ))}
-              </div>
-            </Card>
-          )}
-        </>
+                  <span className="font-medium">{cert.name}</span>
+                </div>
+              ))}
+            </div>
+          </PublicProfileSection>
+        )}
       </div>
     </div>
   );
