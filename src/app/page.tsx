@@ -5,7 +5,7 @@ import { StatsSection } from './_components/StatsSection';
 import { FeaturesSection } from './_components/FeaturesSection';
 import { HowItWorksSection } from './_components/HowItWorksSection';
 import { TestimonialsSection } from './_components/TestimonialsSection';
-import { PricingSection } from './_components/PricingSection';
+// import { PricingSection } from './_components/PricingSection';
 import { CTASection } from './_components/CTASection';
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
       <FeaturesSection />
       <HowItWorksSection />
       <TestimonialsSection />
-      <PricingSection />
+      {/* <PricingSection /> */}
       <CTASection />
       <Footer />
     </div>
