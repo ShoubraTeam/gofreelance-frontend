@@ -13,6 +13,7 @@ import { RegistrationStepTwo } from '../_components/RegistrationStepTwo';
 import { useRegister } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ApiValidationError } from '@/lib/api/client';
+import { verifyToken } from '@/lib/api/auth';
 import {
   registrationSchema,
   type RegistrationFormData,
@@ -24,11 +25,15 @@ export default function RegisterPage(): React.ReactElement {
   const [selectedRole, setSelectedRole] = useState<UserType | null>(null);
   const [error, setError] = useState<string>('');
   const router = useRouter();
-  const setTokens = useAuthStore((state) => state.setTokens);
+  const { setTokens, setUser } = useAuthStore();
 
   const { mutate: register, isPending: isLoading } = useRegister({
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       setTokens(response.data.accessToken, response.data.refreshToken);
+      try {
+        const userResponse = await verifyToken();
+        setUser(userResponse.data);
+      } catch {}
       const redirectPath =
         selectedRole === UserType.CLIENT ? '/app/hire-talent' : '/app/find-work';
       router.push(redirectPath);

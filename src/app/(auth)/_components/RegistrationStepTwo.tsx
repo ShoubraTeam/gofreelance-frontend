@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useMemo } from 'react';
 import { useCountries } from '@/hooks/useCountries';
 import type { RegistrationFormData } from '@/lib/types/registration';
+import { capitalize } from '@/lib/utils';
 import { PhoneNumberField } from './registration-fields/PhoneNumberField';
 import { GenderSelector } from './registration-fields/GenderSelector';
 import { BirthdateField } from './registration-fields/BirthdateField';
@@ -16,13 +17,6 @@ interface RegistrationStepTwoProps {
   onBack: () => void;
 }
 
-const capitalizeCountry = (country: string): string => {
-  return country
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
-
 export function RegistrationStepTwo({
   form,
   isLoading,
@@ -36,7 +30,7 @@ export function RegistrationStepTwo({
     if (!countriesData?.data) return [];
     return Object.keys(countriesData.data).map((country) => ({
       value: country.toLowerCase(),
-      label: capitalizeCountry(country),
+      label: capitalize(country),
     }));
   }, [countriesData]);
 
