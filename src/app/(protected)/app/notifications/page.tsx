@@ -1,8 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   FiBell,
   FiCheckCircle,
@@ -11,6 +10,34 @@ import {
   FiMessageSquare,
   FiBriefcase,
 } from 'react-icons/fi';
+import { NotificationTypeCard } from './_components/NotificationTypeCard';
+
+const NOTIFICATION_TYPES = [
+  {
+    icon: <FiCheckCircle className="w-5 h-5 text-green-600" />,
+    iconBgClass: 'bg-green-100',
+    title: 'Success',
+    description: 'Completed actions and approvals',
+  },
+  {
+    icon: <FiInfo className="w-5 h-5 text-blue-600" />,
+    iconBgClass: 'bg-blue-100',
+    title: 'Information',
+    description: 'Updates and general information',
+  },
+  {
+    icon: <FiAlertCircle className="w-5 h-5 text-yellow-600" />,
+    iconBgClass: 'bg-yellow-100',
+    title: 'Alerts',
+    description: 'Important reminders and warnings',
+  },
+  {
+    icon: <FiMessageSquare className="w-5 h-5 text-purple-600" />,
+    iconBgClass: 'bg-purple-100',
+    title: 'Messages',
+    description: 'New messages from clients or freelancers',
+  },
+];
 
 export default function NotificationsPage() {
   return (
@@ -35,9 +62,7 @@ export default function NotificationsPage() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiBell className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">
-              No Notifications Yet
-            </h3>
+            <h3 className="text-xl font-semibold mb-2">No Notifications Yet</h3>
             <p className="text-muted-foreground mb-6">
               When you receive notifications about your jobs, messages, or proposals,
               they&apos;ll appear here.
@@ -62,69 +87,9 @@ export default function NotificationsPage() {
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">Notification Types</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card className="border-border shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                    <FiCheckCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm mb-1">Success</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Completed actions and approvals
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                    <FiInfo className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm mb-1">Information</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Updates and general information
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center shrink-0">
-                    <FiAlertCircle className="w-5 h-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm mb-1">Alerts</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Important reminders and warnings
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
-                    <FiMessageSquare className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm mb-1">Messages</h3>
-                    <p className="text-xs text-muted-foreground">
-                      New messages from clients or freelancers
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {NOTIFICATION_TYPES.map((type) => (
+              <NotificationTypeCard key={type.title} {...type} />
+            ))}
           </div>
         </div>
       </div>
