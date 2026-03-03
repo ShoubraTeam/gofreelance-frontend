@@ -2,21 +2,17 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { FiPlus } from 'react-icons/fi';
 import type { UseFormReturn } from 'react-hook-form';
-import type { NewJobRequest, ExperienceLevel } from '@/lib/types/job';
-import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/types/job';
+import type { NewJobRequest } from '@/lib/types/job';
 import type { GetProfileResponse } from '@/lib/types/profile';
+import { StepIndicator } from './StepIndicator';
+import { JobTitleStep } from './JobTitleStep';
+import { JobDescriptionStep } from './JobDescriptionStep';
+import { JobBudgetStep } from './JobBudgetStep';
+
+const STEP_LABELS = ['Job Title', 'Job Description', 'Budget & Requirements'];
 
 interface JobCreationFormProps {
   form: UseFormReturn<NewJobRequest>;
@@ -41,9 +37,7 @@ export function JobCreationForm({
   onCancel,
   onSubmit,
 }: JobCreationFormProps) {
-  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = form;
-  const experienceLevel = watch('experienceLevel');
-  const profileId = watch('profileId');
+  const { handleSubmit, trigger } = form;
 
   const handleNext = async () => {
     if (currentStep === 1) {
@@ -58,184 +52,23 @@ export function JobCreationForm({
   return (
     <Card className="mb-8 border-primary/20 shadow-lg">
       <CardContent className="p-6">
-        <div className="mb-8">
-          <div className="flex items-center w-full mb-4">
-            {[1, 2, 3].map((step) => (
-              <div
-                key={step}
-                className="flex items-center"
-                style={{ flex: step < totalSteps ? 1 : '0 0 auto' }}
-              >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                    currentStep >= step
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {step}
-                </div>
-                {step < totalSteps && (
-                  <div
-                    className={`flex-1 h-1 mx-2 transition-all ${
-                      currentStep > step ? 'bg-primary' : 'bg-muted'
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">
-              Step {currentStep} of {totalSteps}:{' '}
-              {currentStep === 1 && 'Job Title'}
-              {currentStep === 2 && 'Job Description'}
-              {currentStep === 3 && 'Budget & Requirements'}
-            </p>
-          </div>
-        </div>
+        <StepIndicator
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          labels={STEP_LABELS}
+        />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {currentStep === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-lg font-semibold text-foreground mb-3">
-                  Which profile are you hiring as?
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <Select
-                  value={profileId}
-                  onValueChange={(value) => setValue('profileId', value)}
-                >
-                  <SelectTrigger className={`text-base ${errors.profileId ? 'border-destructive' : ''}`}>
-                    <SelectValue placeholder="Select a profile" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clientProfiles.map((profile) => (
-                      <SelectItem key={profile.id} value={profile.id}>
-                        {profile.title || profile.id}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <input
-                  type="hidden"
-                  {...register('profileId', { required: 'Please select a profile' })}
-                />
-                {errors.profileId && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.profileId.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-lg font-semibold text-foreground mb-3">
-                  What is the job title?
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <Input
-                  {...register('title', {
-                    required: 'Job title is required',
-                    maxLength: { value: 250, message: 'Max 250 characters' },
-                  })}
-                  placeholder="e.g., Full Stack Developer for E-commerce Platform"
-                  className={`text-base ${errors.title ? 'border-destructive' : ''}`}
-                />
-                {errors.title && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.title.message}
-                  </p>
-                )}
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Choose a clear, descriptive title that will attract the right freelancers
-                </p>
-              </div>
-            </div>
+            <JobTitleStep form={form} clientProfiles={clientProfiles} />
           )}
 
           {currentStep === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-lg font-semibold text-foreground mb-3">
-                  Describe your project
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <Textarea
-                  {...register('content', {
-                    required: 'Job description is required',
-                    maxLength: { value: 1500, message: 'Max 1500 characters' },
-                  })}
-                  rows={8}
-                  placeholder="Describe your project, requirements, and expectations..."
-                  className={`text-base ${errors.content ? 'border-destructive' : ''}`}
-                />
-                {errors.content && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.content.message}
-                  </p>
-                )}
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Include project goals, required skills, deliverables, and timeline
-                </p>
-              </div>
-            </div>
+            <JobDescriptionStep form={form} />
           )}
 
           {currentStep === 3 && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-lg font-semibold text-foreground mb-3">
-                  What is your budget?
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    {...register('jobPrice', {
-                      required: 'Budget is required',
-                      min: { value: 1, message: 'Budget must be at least $1' },
-                    })}
-                    placeholder="5000"
-                    className={`pl-7 text-base ${errors.jobPrice ? 'border-destructive' : ''}`}
-                  />
-                </div>
-                {errors.jobPrice && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.jobPrice.message}
-                  </p>
-                )}
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Set a competitive budget to attract quality freelancers
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-lg font-semibold text-foreground mb-3">
-                  Experience level required
-                </label>
-                <Select
-                  value={experienceLevel}
-                  onValueChange={(value) =>
-                    setValue('experienceLevel', value as ExperienceLevel)
-                  }
-                >
-                  <SelectTrigger className="text-base">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPERIENCE_LEVEL_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Select the minimum experience level for this job
-                </p>
-              </div>
-            </div>
+            <JobBudgetStep form={form} />
           )}
 
           <div className="flex gap-3 pt-4">
@@ -250,11 +83,7 @@ export function JobCreationForm({
             )}
 
             {currentStep < totalSteps ? (
-              <Button
-                type="button"
-                onClick={handleNext}
-                className="ml-auto"
-              >
+              <Button type="button" onClick={handleNext} className="ml-auto">
                 Next
               </Button>
             ) : (
@@ -274,11 +103,7 @@ export function JobCreationForm({
             )}
 
             {hasExistingJobs && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onCancel}
-              >
+              <Button type="button" variant="ghost" onClick={onCancel}>
                 Cancel
               </Button>
             )}

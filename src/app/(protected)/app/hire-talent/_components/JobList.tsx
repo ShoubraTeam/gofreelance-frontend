@@ -63,6 +63,11 @@ export function JobList({ jobs, onCreateJob, onEditJob }: JobListProps) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <FiUsers className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">Proposals:</span>
+                    <span className="font-semibold">{job.proposalCount}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <FiCalendar className="w-4 h-4 text-primary" />
                     <span className="text-muted-foreground">Posted:</span>
                     <span className="font-semibold">
