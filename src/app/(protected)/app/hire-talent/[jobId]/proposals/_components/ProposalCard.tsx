@@ -6,9 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { ProposalResponse, ProposalStatus } from '@/lib/types/proposal';
 import { STATUS_COLORS } from '@/lib/constants/statusStyles';
 import { createContract } from '@/lib/api/contracts';
+import { startChat } from '@/lib/api/chat';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { FiDollarSign, FiClock, FiCalendar, FiUser, FiStar } from 'react-icons/fi';
+import { FiDollarSign, FiClock, FiCalendar, FiUser, FiStar, FiMessageSquare } from 'react-icons/fi';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -20,9 +21,10 @@ const STATUS_STYLES: Record<ProposalStatus, string> = {
 
 interface ProposalCardProps {
   proposal: ProposalResponse;
+  jobTitle: string;
 }
 
-export function ProposalCard({ proposal }: ProposalCardProps) {
+export function ProposalCard({ proposal, jobTitle }: ProposalCardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const statusLabel = proposal.status.charAt(0) + proposal.status.slice(1).toLowerCase();
@@ -36,6 +38,18 @@ export function ProposalCard({ proposal }: ProposalCardProps) {
     },
     onError: () => {
       toast.error('Failed to accept proposal. Please try again.');
+    },
+  });
+
+  const { mutate: openChat, isPending: isStartingChat } = useMutation({
+    mutationFn: () => startChat(proposal.id),
+    onSuccess: (response) => {
+      router.push(
+        `/app/messages/${response.data.chatId}?other=${encodeURIComponent(proposal.fullName)}&job=${encodeURIComponent(jobTitle)}`
+      );
+    },
+    onError: () => {
+      toast.error('Failed to open chat. Please try again.');
     },
   });
 
@@ -81,13 +95,28 @@ export function ProposalCard({ proposal }: ProposalCardProps) {
             <span>{new Date(proposal.createdAt).toLocaleDateString()}</span>
           </div>
 
-          {proposal.status === 'PENDING' && (
-            <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => openChat()}
+              disabled={isStartingChat}
+            >
+              {isStartingChat ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <FiMessageSquare className="w-4 h-4 mr-1.5" />
+                  Message
+                </>
+              )}
+            </Button>
+            {proposal.status === 'PENDING' && (
               <Button size="sm" onClick={() => accept()} disabled={isPending}>
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Accept'}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

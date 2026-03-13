@@ -70,7 +70,7 @@ export default function JobProposalsPage() {
         {!isLoading && proposals.length > 0 && (
           <div className="space-y-4">
             {proposals.map((proposal) => (
-              <ProposalCard key={proposal.id} proposal={proposal} />
+              <ProposalCard key={proposal.id} proposal={proposal} jobTitle={job?.title ?? ''} />
             ))}
 
             {totalPages > 1 && (
