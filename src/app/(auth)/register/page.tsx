@@ -85,6 +85,13 @@ export default function RegisterPage(): React.ReactElement {
       'password',
       'confirmPassword',
     ]);
+
+    const { password, confirmPassword } = form.getValues();
+    if (password !== confirmPassword) {
+      form.setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' });
+      return;
+    }
+
     if (isValid) {
       setCurrentStep(2);
     }

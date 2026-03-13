@@ -23,9 +23,11 @@ export function useAuthValidation() {
         const response = await verifyToken();
         setUser(response.data);
         setIsValid(true);
-      } catch {
-        clearTokens();
-        setIsValid(false);
+      } catch (error) {
+        if (error instanceof Error && error.message === 'UNAUTHORIZED') {
+          clearTokens();
+          setIsValid(false);
+        }
       } finally {
         setIsValidating(false);
       }
