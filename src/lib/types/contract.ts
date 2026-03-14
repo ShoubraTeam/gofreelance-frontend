@@ -25,5 +25,5 @@ export interface MilestoneResponse {
   startedAt: string | null;
   endedAt: string | null;
   createdAt: string;
-  fileUrl: string | null;
+  fileName: string | null;
 }

@@ -6,13 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { MilestoneResponse, MilestoneStatus } from '@/lib/types/contract';
 import { STATUS_COLORS } from '@/lib/constants/statusStyles';
-import { acceptMilestone, fundMilestone } from '@/lib/api/contracts';
+import { acceptMilestone, approveMilestone, fundMilestone, downloadMilestone } from '@/lib/api/contracts';
 import { capitalize } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FiDollarSign, FiCalendar, FiEdit2 } from 'react-icons/fi';
+import { FiDollarSign, FiCalendar, FiEdit2, FiUpload, FiDownload } from 'react-icons/fi';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { EditMilestoneDialog } from './EditMilestoneDialog';
+import { SubmitMilestoneDialog } from './SubmitMilestoneDialog';
 
 const STATUS_STYLES: Record<MilestoneStatus, string> = {
   PENDING: STATUS_COLORS.pending,
@@ -32,6 +33,7 @@ interface MilestoneCardProps {
 export function MilestoneCard({ milestone, contractId, isFreelancer }: MilestoneCardProps) {
   const queryClient = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
 
   const { mutate: accept, isPending: isAccepting } = useMutation({
     mutationFn: () => acceptMilestone(milestone.id),
@@ -40,6 +42,21 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
       queryClient.invalidateQueries({ queryKey: ['milestones', contractId] });
     },
     onError: () => toast.error('Failed to accept milestone.'),
+  });
+
+  const { mutate: approve, isPending: isApproving } = useMutation({
+    mutationFn: () => approveMilestone(milestone.id),
+    onSuccess: () => {
+      toast.success('Milestone approved.');
+      queryClient.invalidateQueries({ queryKey: ['milestones', contractId] });
+    },
+    onError: () => toast.error('Failed to approve milestone.'),
+  });
+
+  const { mutate: download, isPending: isDownloading } = useMutation({
+    mutationFn: () => downloadMilestone(milestone.id),
+    onSuccess: (url) => window.open(url, '_blank'),
+    onError: () => toast.error('Failed to download file.'),
   });
 
   const { mutate: fund, isPending: isFunding } = useMutation({
@@ -86,30 +103,45 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
             </div>
           )}
 
-          {isFreelancer && milestone.status === 'PENDING' && (
-            <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            {isFreelancer && milestone.status === 'PENDING' && (
               <Button size="sm" onClick={() => accept()} disabled={isAccepting}>
                 {isAccepting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Accept'}
               </Button>
-            </div>
-          )}
+            )}
 
-          {!isFreelancer && milestone.status === 'NOT_FUNDED' && (
-            <div className="ml-auto">
+            {!isFreelancer && milestone.status === 'NOT_FUNDED' && (
               <Button size="sm" variant="secondary" onClick={() => fund()} disabled={isFunding}>
                 {isFunding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Fund'}
               </Button>
-            </div>
-          )}
+            )}
 
-          {!isFreelancer && milestone.status === 'PENDING' && (
-            <div className="ml-auto">
+            {!isFreelancer && milestone.status === 'PENDING' && (
               <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
                 <FiEdit2 className="w-3.5 h-3.5 mr-1.5" />
                 Edit
               </Button>
-            </div>
-          )}
+            )}
+
+            {!isFreelancer && milestone.status === 'UNDER_REVIEW' && (
+              <Button size="sm" variant="secondary" onClick={() => approve()} disabled={isApproving}>
+                {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
+              </Button>
+            )}
+
+            {isFreelancer && (milestone.status === 'IN_PROGRESS' || milestone.status === 'UNDER_REVIEW') && (
+              <Button size="sm" onClick={() => setSubmitOpen(true)}>
+                <FiUpload className="w-3.5 h-3.5 mr-1.5" />
+                {milestone.status === 'UNDER_REVIEW' ? 'Resubmit' : 'Submit'}
+              </Button>
+            )}
+
+            {milestone.fileName && (
+              <Button size="sm" variant="outline" onClick={() => download()} disabled={isDownloading}>
+                {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><FiDownload className="w-3.5 h-3.5 mr-1.5" />Download</>}
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
 
@@ -118,6 +150,13 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
         contractId={contractId}
         open={editOpen}
         onOpenChange={setEditOpen}
+      />
+
+      <SubmitMilestoneDialog
+        milestoneId={milestone.id}
+        contractId={contractId}
+        open={submitOpen}
+        onOpenChange={setSubmitOpen}
       />
     </Card>
   );
