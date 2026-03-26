@@ -103,6 +103,17 @@ export async function editMilestone(
   );
 }
 
+export async function rejectMilestone(
+  milestoneId: string,
+  content: string
+): Promise<ApiResponse<MilestoneResponse>> {
+  return apiClient.patch<ApiResponse<MilestoneResponse>, { content: string }>(
+    `/milestones/${milestoneId}/reject`,
+    { content },
+    { requiresAuth: true }
+  );
+}
+
 export async function approveMilestone(
   milestoneId: string
 ): Promise<ApiResponse<MilestoneResponse>> {
@@ -132,6 +143,16 @@ export async function submitMilestone(
   }
 
   return response.json();
+}
+
+export async function closeContract(
+  contractId: string
+): Promise<ApiResponse<{ contractId: string }>> {
+  return apiClient.post<ApiResponse<{ contractId: string }>, Record<string, never>>(
+    `/contracts/${contractId}/close`,
+    {},
+    { requiresAuth: true }
+  );
 }
 
 export async function downloadMilestone(milestoneId: string): Promise<string> {

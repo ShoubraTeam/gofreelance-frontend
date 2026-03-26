@@ -1,4 +1,4 @@
-export type ContractStatus = 'OPENED' | 'COMPLETED' | 'TERMINATED';
+export type ContractStatus = 'OPEN' | 'ON_DISPUTE' | 'CLOSED';
 export type MilestoneStatus =
   | 'PENDING'
   | 'NOT_FUNDED'
@@ -14,6 +14,7 @@ export interface ContractResponse {
   contractStatus: ContractStatus;
   createdAt: string;
   freelancerId: string | null;
+  rated: boolean;
 }
 
 export interface MilestoneResponse {
