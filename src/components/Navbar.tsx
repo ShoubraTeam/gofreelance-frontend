@@ -9,10 +9,13 @@ import { NotificationsDropdown } from './navbar/NotificationsDropdown';
 import { HelpModal } from './navbar/HelpModal';
 import { UserMenu } from './navbar/UserMenu';
 import { NavLinks } from './navbar/NavLinks';
+import { MobileMenu } from './navbar/MobileMenu';
+import { FiMenu, FiX } from 'react-icons/fi';
 
 export function Navbar() {
   const { user } = useAuthStore();
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isFreelancer = user?.currentType === UserType.FREELANCER;
   const homeHref = user?.currentType ? getHomeRoute(user.currentType) : '/app/find-work';
@@ -22,6 +25,7 @@ export function Navbar() {
     { href: homeHref, label: homeLabel },
     { href: '/app/contracts', label: 'My Contracts' },
     { href: '/app/messages', label: 'Messages' },
+    { href: '/app/disputes', label: 'Disputes' },
   ];
 
   return (
@@ -43,6 +47,14 @@ export function Navbar() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Mobile menu toggle */}
+            <button
+              className="md:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+            </button>
             {/* Notifications */}
             <NotificationsDropdown />
 
@@ -71,6 +83,10 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <MobileMenu links={navLinks} onClose={() => setMobileMenuOpen(false)} />
+      )}
 
       <HelpModal
         open={showHelpModal}
