@@ -24,7 +24,9 @@ export default function ContractsPage() {
   });
 
   const isLoading = isLoadingProfiles || (!!currentProfile && isLoadingContracts);
-  const contracts = data?.data ?? [];
+  const contracts = (data?.data ?? []).slice().sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   return (
     <div className="min-h-screen bg-muted/30">

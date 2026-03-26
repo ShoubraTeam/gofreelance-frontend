@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -10,10 +10,13 @@ import { capitalize } from '@/lib/utils';
 import { CONTRACT_STATUS_STYLES, shortContractId } from '../_components/contract-status';
 import { MilestoneCard } from './_components/MilestoneCard';
 import { AddMilestoneForm } from './_components/AddMilestoneForm';
+import { CloseContractButton } from './_components/CloseContractButton';
+import { FeedbackForm } from './_components/FeedbackForm';
+import { CreateDisputeDialog } from './_components/CreateDisputeDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { FiArrowLeft, FiCalendar } from 'react-icons/fi';
+import { FiArrowLeft, FiCalendar, FiAlertTriangle } from 'react-icons/fi';
 
 interface PageProps {
   params: Promise<{ contractId: string }>;
@@ -38,6 +41,7 @@ export default function ContractDetailPage({ params }: PageProps) {
   const contract = contractData?.data;
   const milestones = milestonesData?.data ?? [];
   const isLoading = isLoadingContract || isLoadingMilestones;
+  const [disputeOpen, setDisputeOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -71,9 +75,25 @@ export default function ContractDetailPage({ params }: PageProps) {
                   <span>Created {new Date(contract.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              <Badge className={CONTRACT_STATUS_STYLES[contract.contractStatus]}>
-                {capitalize(contract.contractStatus)}
-              </Badge>
+              <div className="flex items-center gap-3">
+                {contract.contractStatus !== 'ON_DISPUTE' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDisputeOpen(true)}
+                    className="text-destructive border-destructive/40 hover:bg-destructive/10"
+                  >
+                    <FiAlertTriangle className="w-4 h-4 mr-2" />
+                    Open Dispute
+                  </Button>
+                )}
+                {isClient && contract.contractStatus === 'OPEN' && (
+                  <CloseContractButton contractId={contractId} milestones={milestones} />
+                )}
+                <Badge className={CONTRACT_STATUS_STYLES[contract.contractStatus]}>
+                  {capitalize(contract.contractStatus)}
+                </Badge>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -100,11 +120,21 @@ export default function ContractDetailPage({ params }: PageProps) {
               ))}
             </div>
 
-            {isClient && contract.contractStatus === 'OPENED' && (
+            {isClient && contract.contractStatus === 'OPEN' && (
               <AddMilestoneForm contractId={contractId} />
+            )}
+
+            {contract.contractStatus === 'CLOSED' && (
+              <FeedbackForm contractId={contractId} isRated={contract.rated} />
             )}
           </div>
         )}
+
+        <CreateDisputeDialog
+          contractId={contractId}
+          open={disputeOpen}
+          onOpenChange={setDisputeOpen}
+        />
       </div>
     </div>
   );

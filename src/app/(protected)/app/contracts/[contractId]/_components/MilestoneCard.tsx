@@ -14,6 +14,7 @@ import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { EditMilestoneDialog } from './EditMilestoneDialog';
 import { SubmitMilestoneDialog } from './SubmitMilestoneDialog';
+import { RejectMilestoneDialog } from './RejectMilestoneDialog';
 
 const STATUS_STYLES: Record<MilestoneStatus, string> = {
   PENDING: STATUS_COLORS.pending,
@@ -34,6 +35,7 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
   const queryClient = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
 
   const { mutate: accept, isPending: isAccepting } = useMutation({
     mutationFn: () => acceptMilestone(milestone.id),
@@ -124,9 +126,14 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
             )}
 
             {!isFreelancer && milestone.status === 'UNDER_REVIEW' && (
-              <Button size="sm" variant="secondary" onClick={() => approve()} disabled={isApproving}>
-                {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
-              </Button>
+              <>
+                <Button size="sm" variant="secondary" onClick={() => approve()} disabled={isApproving}>
+                  {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => setRejectOpen(true)}>
+                  Reject
+                </Button>
+              </>
             )}
 
             {isFreelancer && (milestone.status === 'IN_PROGRESS' || milestone.status === 'UNDER_REVIEW') && (
@@ -157,6 +164,13 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
         contractId={contractId}
         open={submitOpen}
         onOpenChange={setSubmitOpen}
+      />
+
+      <RejectMilestoneDialog
+        milestoneId={milestone.id}
+        contractId={contractId}
+        open={rejectOpen}
+        onOpenChange={setRejectOpen}
       />
     </Card>
   );
