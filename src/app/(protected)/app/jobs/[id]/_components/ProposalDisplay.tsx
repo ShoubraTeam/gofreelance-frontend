@@ -29,7 +29,7 @@ export function ProposalDisplay({
         <div className="bg-muted/50 rounded-lg p-4">
           <p className="text-sm text-muted-foreground mb-1">Your Bid</p>
           <p className="text-2xl font-bold text-primary">
-            ${proposal.totalPrice.toLocaleString()}
+            {proposal.totalPrice != null ? `$${proposal.totalPrice.toLocaleString()}` : '—'}
           </p>
         </div>
 

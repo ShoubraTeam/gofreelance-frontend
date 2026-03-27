@@ -89,7 +89,7 @@ export default function JobDetailsPage() {
 
   const handleSubmitProposal = () => {
     const content = proposalContent.trim() || (existingProposal?.content ?? '');
-    const price = proposalPrice || (existingProposal?.totalPrice.toString() ?? '');
+    const price = proposalPrice || (existingProposal?.totalPrice?.toString() ?? '');
     const hours = proposalHours || (existingProposal?.totalTimeHours.toString() ?? '');
 
     if (!content) {
@@ -133,7 +133,7 @@ export default function JobDetailsPage() {
   const handleEditClick = () => {
     if (existingProposal) {
       setProposalContent(existingProposal.content);
-      setProposalPrice(existingProposal.totalPrice.toString());
+      setProposalPrice(existingProposal.totalPrice?.toString() ?? '');
       setProposalHours(existingProposal.totalTimeHours.toString());
       setIsEditMode(true);
     }

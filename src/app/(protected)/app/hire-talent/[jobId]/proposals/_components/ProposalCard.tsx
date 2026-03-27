@@ -80,12 +80,14 @@ export function ProposalCard({ proposal, jobTitle }: ProposalCardProps) {
         <p className="text-sm text-foreground leading-relaxed">{proposal.content}</p>
 
         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground border-t pt-4">
-          <div className="flex items-center gap-1.5">
-            <FiDollarSign className="w-4 h-4 text-primary" />
-            <span className="font-semibold text-foreground">
-              ${proposal.totalPrice.toLocaleString()}
-            </span>
-          </div>
+          {proposal.totalPrice != null && (
+            <div className="flex items-center gap-1.5">
+              <FiDollarSign className="w-4 h-4 text-primary" />
+              <span className="font-semibold text-foreground">
+                ${proposal.totalPrice.toLocaleString()}
+              </span>
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <FiClock className="w-4 h-4 text-primary" />
             <span>{proposal.totalTimeHours}h estimated</span>
