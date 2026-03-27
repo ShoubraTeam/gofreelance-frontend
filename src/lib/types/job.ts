@@ -14,7 +14,7 @@ export interface NewJobRequest {
   profileId: string;
   title: string;
   content: string;
-  jobPrice: number;
+  jobPrice?: number;
   experienceLevel: ExperienceLevel;
   jobType: JobType;
 }

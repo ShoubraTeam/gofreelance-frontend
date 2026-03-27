@@ -21,7 +21,7 @@ export interface MilestoneResponse {
   id: string;
   contractId: string;
   content: string;
-  price: number;
+  price: number | null;
   status: MilestoneStatus;
   startedAt: string | null;
   endedAt: string | null;

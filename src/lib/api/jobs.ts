@@ -32,15 +32,25 @@ export async function updateJob(
   );
 }
 
-export async function getPublicJobs(page = 0): Promise<ApiResponse<JobsPage>> {
+export async function getPublicJobs(page = 0, jobType?: 'JOB' | 'MENTORSHIP'): Promise<ApiResponse<JobsPage>> {
   const params = new URLSearchParams({
     'page': page.toString(),
     'size': '10',
   });
+  if (jobType) params.set('jobType', jobType);
 
   return apiClient.get<ApiResponse<JobsPage>>(
     `/jobs/public?${params.toString()}`,
     { requiresAuth: false }
+  );
+}
+
+export async function getFreelancerJobs(
+  profileId: string
+): Promise<ApiResponse<JobResponse[]>> {
+  return apiClient.get<ApiResponse<JobResponse[]>>(
+    `/jobs/client/${profileId}`,
+    { requiresAuth: true }
   );
 }
 

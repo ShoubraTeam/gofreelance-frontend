@@ -5,7 +5,7 @@ export interface CreateProposalRequest {
   freelancerProfileId: string;
   content: string;
   totalTimeHours: number;
-  totalPrice: number;
+  totalPrice?: number;
 }
 
 export interface ProposalResponse {
@@ -17,7 +17,7 @@ export interface ProposalResponse {
   averageRating: number;
   content: string;
   totalTimeHours: number;
-  totalPrice: number;
+  totalPrice: number | null;
   status: ProposalStatus;
   createdAt: string;
 }
@@ -25,7 +25,7 @@ export interface ProposalResponse {
 export interface EditProposalRequest {
   content: string;
   totalTimeHours: number;
-  totalPrice: number;
+  totalPrice?: number;
 }
 
 export interface ProposalsPage {

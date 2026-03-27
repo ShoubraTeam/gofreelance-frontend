@@ -23,12 +23,13 @@ export async function createContract(
 }
 
 export async function getContractsByProfileId(
-  profileId: string
+  profileId: string,
+  jobType?: 'JOB' | 'MENTORSHIP'
 ): Promise<ApiResponse<ContractResponse[]>> {
-  return apiClient.get<ApiResponse<ContractResponse[]>>(
-    `/profiles/${profileId}/contracts`,
-    { requiresAuth: true }
-  );
+  const url = jobType
+    ? `/profiles/${profileId}/contracts?jobType=${jobType}`
+    : `/profiles/${profileId}/contracts`;
+  return apiClient.get<ApiResponse<ContractResponse[]>>(url, { requiresAuth: true });
 }
 
 export async function getContractById(
@@ -51,7 +52,7 @@ export async function getContractMilestones(
 
 export interface AddMilestoneRequest {
   content: string;
-  price: number;
+  price?: number;
   startedAt?: string;
   endedAt?: string;
 }
