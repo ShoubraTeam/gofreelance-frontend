@@ -25,7 +25,7 @@ export default function FindWorkPage() {
 
   const { data: jobsData, isLoading } = useQuery({
     queryKey: ['public-jobs', currentPage],
-    queryFn: () => getPublicJobs(currentPage),
+    queryFn: () => getPublicJobs(currentPage, 'JOB'),
   });
 
   const pagedData = jobsData?.data;
