@@ -19,7 +19,8 @@ export function getHomeRoute(currentType: UserType): string {
 }
 
 export function getApiErrorMessage(error: unknown, fallback: string): string {
-  return (error as { response?: { data?: { error?: string } } })?.response?.data?.error || fallback;
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
 }
 
 export function createSaveHandlers(
