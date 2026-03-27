@@ -13,10 +13,16 @@ import { FiCalendar, FiUser, FiFileText } from 'react-icons/fi';
 interface ContractCardProps {
   contract: ContractResponse;
   currentType: UserType;
+  isMentorship?: boolean;
+  isMentor?: boolean;
 }
 
-export function ContractCard({ contract, currentType }: ContractCardProps) {
+export function ContractCard({ contract, currentType, isMentorship = false, isMentor = false }: ContractCardProps) {
   const router = useRouter();
+
+  const detailUrl = isMentorship
+    ? `/app/contracts/${contract.contractId}?jobType=MENTORSHIP`
+    : `/app/contracts/${contract.contractId}`;
 
   return (
     <Card className="hover:border-primary/40 transition-colors">
@@ -44,7 +50,7 @@ export function ContractCard({ contract, currentType }: ContractCardProps) {
             <span>{new Date(contract.createdAt).toLocaleDateString()}</span>
           </div>
 
-          {currentType === UserType.CLIENT && (
+          {!isMentorship && currentType === UserType.CLIENT && (
             <div className="flex items-center gap-1.5">
               <FiUser className="w-4 h-4 text-primary" />
               <button
@@ -60,7 +66,7 @@ export function ContractCard({ contract, currentType }: ContractCardProps) {
             </div>
           )}
 
-          {currentType === UserType.FREELANCER && (
+          {!isMentorship && currentType === UserType.FREELANCER && (
             <div className="flex items-center gap-1.5">
               <FiUser className="w-4 h-4 text-primary" />
               <button
@@ -76,11 +82,43 @@ export function ContractCard({ contract, currentType }: ContractCardProps) {
             </div>
           )}
 
+          {isMentorship && isMentor && (
+            <div className="flex items-center gap-1.5">
+              <FiUser className="w-4 h-4 text-primary" />
+              <button
+                className={`transition-colors ${contract.freelancerId ? 'hover:text-primary' : 'opacity-40 cursor-not-allowed'}`}
+                onClick={() => {
+                  if (contract.freelancerId) {
+                    router.push(`/profile/public/${contract.freelancerId}`);
+                  }
+                }}
+              >
+                View Mentee
+              </button>
+            </div>
+          )}
+
+          {isMentorship && !isMentor && (
+            <div className="flex items-center gap-1.5">
+              <FiUser className="w-4 h-4 text-primary" />
+              <button
+                className={`transition-colors ${contract.authorId ? 'hover:text-primary' : 'opacity-40 cursor-not-allowed'}`}
+                onClick={() => {
+                  if (contract.authorId) {
+                    router.push(`/profile/public/${contract.authorId}`);
+                  }
+                }}
+              >
+                View Mentor
+              </button>
+            </div>
+          )}
+
           <div className="ml-auto">
             <Button
               size="sm"
               variant="outline"
-              onClick={() => router.push(`/app/contracts/${contract.contractId}`)}
+              onClick={() => router.push(detailUrl)}
             >
               View Details
             </Button>

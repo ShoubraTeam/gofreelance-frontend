@@ -23,6 +23,7 @@ interface EditMilestoneDialogProps {
   contractId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isMentorship?: boolean;
 }
 
 export function EditMilestoneDialog({
@@ -30,16 +31,17 @@ export function EditMilestoneDialog({
   contractId,
   open,
   onOpenChange,
+  isMentorship = false,
 }: EditMilestoneDialogProps) {
   const queryClient = useQueryClient();
   const [content, setContent] = useState(milestone.content);
-  const [price, setPrice] = useState(String(milestone.price));
+  const [price, setPrice] = useState(String(milestone.price ?? ''));
 
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
       editMilestone(milestone.id, {
         content: content.trim() !== milestone.content ? content.trim() : undefined,
-        price: Number(price) !== milestone.price ? Number(price) : undefined,
+        price: !isMentorship && Number(price) !== milestone.price ? Number(price) : undefined,
       }),
     onSuccess: () => {
       toast.success('Milestone updated.');
@@ -51,7 +53,8 @@ export function EditMilestoneDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !price || Number(price) <= 0) return;
+    if (!content.trim()) return;
+    if (!isMentorship && (!price || Number(price) <= 0)) return;
     mutate();
   };
 
@@ -74,18 +77,20 @@ export function EditMilestoneDialog({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="price">Price ($)</Label>
-            <Input
-              id="price"
-              type="number"
-              min={1}
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-          </div>
+          {!isMentorship && (
+            <div className="space-y-2">
+              <Label htmlFor="price">Price ($)</Label>
+              <Input
+                id="price"
+                type="number"
+                min={1}
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

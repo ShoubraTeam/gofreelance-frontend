@@ -29,9 +29,10 @@ interface MilestoneCardProps {
   milestone: MilestoneResponse;
   contractId: string;
   isFreelancer: boolean;
+  isMentorship?: boolean;
 }
 
-export function MilestoneCard({ milestone, contractId, isFreelancer }: MilestoneCardProps) {
+export function MilestoneCard({ milestone, contractId, isFreelancer, isMentorship = false }: MilestoneCardProps) {
   const queryClient = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -81,12 +82,14 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
         </div>
 
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-1">
-          <div className="flex items-center gap-1.5">
-            <FiDollarSign className="w-4 h-4 text-primary" />
-            <span className="font-semibold text-foreground">
-              ${milestone.price.toLocaleString()}
-            </span>
-          </div>
+          {milestone.price != null && (
+            <div className="flex items-center gap-1.5">
+              <FiDollarSign className="w-4 h-4 text-primary" />
+              <span className="font-semibold text-foreground">
+                ${milestone.price.toLocaleString()}
+              </span>
+            </div>
+          )}
 
           {milestone.startedAt && (
             <div className="flex items-center gap-1.5">
@@ -112,7 +115,7 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
               </Button>
             )}
 
-            {!isFreelancer && milestone.status === 'NOT_FUNDED' && (
+            {!isFreelancer && !isMentorship && milestone.status === 'NOT_FUNDED' && (
               <Button size="sm" variant="secondary" onClick={() => fund()} disabled={isFunding}>
                 {isFunding ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Fund'}
               </Button>
@@ -130,9 +133,11 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
                 <Button size="sm" variant="secondary" onClick={() => approve()} disabled={isApproving}>
                   {isApproving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => setRejectOpen(true)}>
-                  Reject
-                </Button>
+                {!isMentorship && (
+                  <Button size="sm" variant="destructive" onClick={() => setRejectOpen(true)}>
+                    Reject
+                  </Button>
+                )}
               </>
             )}
 
@@ -157,6 +162,7 @@ export function MilestoneCard({ milestone, contractId, isFreelancer }: Milestone
         contractId={contractId}
         open={editOpen}
         onOpenChange={setEditOpen}
+        isMentorship={isMentorship}
       />
 
       <SubmitMilestoneDialog

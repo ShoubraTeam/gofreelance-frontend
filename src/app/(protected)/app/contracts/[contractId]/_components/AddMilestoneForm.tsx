@@ -13,9 +13,10 @@ import toast from 'react-hot-toast';
 
 interface AddMilestoneFormProps {
   contractId: string;
+  isMentorship?: boolean;
 }
 
-export function AddMilestoneForm({ contractId }: AddMilestoneFormProps) {
+export function AddMilestoneForm({ contractId, isMentorship = false }: AddMilestoneFormProps) {
   const queryClient = useQueryClient();
   const [content, setContent] = useState('');
   const [price, setPrice] = useState('');
@@ -26,7 +27,7 @@ export function AddMilestoneForm({ contractId }: AddMilestoneFormProps) {
     mutationFn: () =>
       addMilestone(contractId, {
         content,
-        price: parseFloat(price),
+        price: isMentorship ? undefined : parseFloat(price),
         startedAt: startedAt || undefined,
         endedAt: endedAt || undefined,
       }),
@@ -43,7 +44,7 @@ export function AddMilestoneForm({ contractId }: AddMilestoneFormProps) {
     },
   });
 
-  const isValid = content.trim().length > 0 && parseFloat(price) > 0;
+  const isValid = content.trim().length > 0 && (isMentorship || parseFloat(price) > 0);
 
   return (
     <Card>
@@ -62,18 +63,20 @@ export function AddMilestoneForm({ contractId }: AddMilestoneFormProps) {
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="price">Price ($)</Label>
-          <Input
-            id="price"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        </div>
+        {!isMentorship && (
+          <div className="space-y-1.5">
+            <Label htmlFor="price">Price ($)</Label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
