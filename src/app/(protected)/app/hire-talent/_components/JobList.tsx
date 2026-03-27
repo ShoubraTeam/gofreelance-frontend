@@ -80,15 +80,22 @@ export function JobList({ jobs, onCreateJob, onEditJob }: JobListProps) {
 
             <div className="border-t pt-4 flex items-center justify-end">
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => router.push(`/app/hire-talent/${job.id}/proposals`)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    router.push(`/app/hire-talent/${job.id}/proposals`)
+                  }
+                >
                   <FiUsers className="w-4 h-4 mr-2" />
                   View Proposals
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => onEditJob(job)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEditJob(job)}
+                >
                   Edit
-                </Button>
-                <Button variant="outline" size="sm">
-                  {job.jobStatus === 'CLOSED' ? 'Reopen' : 'Close'}
                 </Button>
               </div>
             </div>
