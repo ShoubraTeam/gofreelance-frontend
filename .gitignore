@@ -42,4 +42,7 @@ next-env.d.ts
 
 # Plans
 plans
+
+# Docs
+docs
 .env*.local
