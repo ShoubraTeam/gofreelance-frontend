@@ -16,7 +16,7 @@ export function NavLinks({ links }: NavLinksProps) {
   const pathname = usePathname();
 
   return (
-    <div className="hidden md:flex md:ml-8 md:space-x-1">
+    <div className="hidden lg:flex lg:ml-8 lg:space-x-1">
       {links.map((link) => {
         const isActive = pathname === link.href;
         return (

@@ -17,7 +17,7 @@ export function MobileMenu({ links, onClose }: MobileMenuProps) {
   const pathname = usePathname();
 
   return (
-    <div className="md:hidden border-t border-gray-200 bg-white px-4 py-3 space-y-1">
+    <div className="lg:hidden border-t border-gray-200 bg-white px-4 py-3 space-y-1">
       {links.map((link) => {
         const isActive = pathname === link.href;
         return (

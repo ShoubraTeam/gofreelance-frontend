@@ -23,6 +23,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: homeHref, label: homeLabel },
+    ...(isFreelancer ? [{ href: '/app/mentorships', label: 'Mentorships' }] : []),
     { href: '/app/contracts', label: 'My Contracts' },
     { href: '/app/messages', label: 'Messages' },
     { href: '/app/disputes', label: 'Disputes' },
@@ -49,7 +50,7 @@ export function Navbar() {
           <div className="flex items-center space-x-4">
             {/* Mobile menu toggle */}
             <button
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              className="lg:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label="Toggle menu"
             >
