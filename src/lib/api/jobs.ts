@@ -1,6 +1,15 @@
 import { apiClient } from './client';
 import type { ApiResponse } from '../types/api';
-import type { NewJobRequest, JobResponse, UpdateJobRequest, JobsPage } from '../types/job';
+import type {
+  NewJobRequest,
+  JobResponse,
+  UpdateJobRequest,
+  JobsPage,
+  DetectToolsRequest,
+  DetectToolsResponse,
+  EnhanceDescriptionRequest,
+  EnhanceDescriptionResponse,
+} from '../types/job';
 import type { ProposalsPage } from '../types/proposal';
 
 export async function createJob(
@@ -69,5 +78,25 @@ export async function getJobById(id: string): Promise<ApiResponse<JobResponse>> 
   return apiClient.get<ApiResponse<JobResponse>>(
     `/jobs/public/${id}`,
     { requiresAuth: false }
+  );
+}
+
+export async function detectTools(
+  data: DetectToolsRequest
+): Promise<ApiResponse<DetectToolsResponse>> {
+  return apiClient.post<ApiResponse<DetectToolsResponse>, DetectToolsRequest>(
+    '/jobs/suggestions/detect-tool',
+    data,
+    { requiresAuth: true }
+  );
+}
+
+export async function enhanceDescription(
+  data: EnhanceDescriptionRequest
+): Promise<ApiResponse<EnhanceDescriptionResponse>> {
+  return apiClient.post<ApiResponse<EnhanceDescriptionResponse>, EnhanceDescriptionRequest>(
+    '/jobs/suggestions/enhance-description',
+    data,
+    { requiresAuth: true }
   );
 }

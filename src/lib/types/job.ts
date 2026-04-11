@@ -45,3 +45,24 @@ export interface JobsPage {
   last: boolean;
   number: number;
 }
+
+export interface DetectToolsRequest {
+  jobTitle: string;
+  jobDescription: string;
+}
+
+export interface DetectToolsResponse {
+  hasTools: boolean;
+  tools: string[] | null;
+}
+
+export interface EnhanceDescriptionRequest {
+  jobTitle: string;
+  jobDescription: string;
+  tools?: string[];
+}
+
+export interface EnhanceDescriptionResponse {
+  originalDescription: string;
+  enhancedDescription: string;
+}
