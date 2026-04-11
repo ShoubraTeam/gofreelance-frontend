@@ -11,7 +11,7 @@ import type { NewJobRequest, ExperienceLevel, JobResponse } from '@/lib/types/jo
 import { useForm } from 'react-hook-form';
 import { QuickActionCards } from './_components/QuickActionCards';
 import { JobCreationForm } from './_components/JobCreationForm';
-import { TalentSearchSection } from './_components/TalentSearchSection';
+// import { TalentSearchSection } from './_components/TalentSearchSection';
 import { JobList } from './_components/JobList';
 import { EditJobDialog } from './_components/EditJobDialog';
 
@@ -22,7 +22,7 @@ export default function HireTalentPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [editingJob, setEditingJob] = useState<JobResponse | null>(null);
   const [activeTab, setActiveTab] = useState<'jobs' | 'talent'>('jobs');
-  const [talentSearch, setTalentSearch] = useState('');
+  // const [talentSearch, setTalentSearch] = useState('');
 
   const form = useForm<NewJobRequest>({
     defaultValues: {
@@ -126,6 +126,7 @@ export default function HireTalentPage() {
             Post jobs and discover talented freelancers for your projects
           </p>
 
+          {/* Tabs — Find Talent tab hidden for now
           <div className="flex items-center gap-4 border-b">
             <button
               onClick={() => {
@@ -160,6 +161,7 @@ export default function HireTalentPage() {
               )}
             </button>
           </div>
+          */}
         </div>
 
         {activeTab === 'jobs' && !shouldShowForm && (
@@ -186,12 +188,14 @@ export default function HireTalentPage() {
           />
         )}
 
+        {/* Find Talent section hidden for now
         {activeTab === 'talent' && (
           <TalentSearchSection
             searchValue={talentSearch}
             onSearchChange={setTalentSearch}
           />
         )}
+        */}
 
         {activeTab === 'jobs' && jobs.length > 0 && !shouldShowForm && (
           <JobList
