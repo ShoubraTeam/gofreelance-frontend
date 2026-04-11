@@ -5,8 +5,9 @@ import { useMutation } from '@tanstack/react-query';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { FiZap } from 'react-icons/fi';
+import { FiZap, FiEye, FiEdit2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { MarkdownContent } from '@/components/MarkdownContent';
 import type { UseFormReturn } from 'react-hook-form';
 import type { NewJobRequest } from '@/lib/types/job';
 import { detectTools, enhanceDescription } from '@/lib/api/jobs';
@@ -23,6 +24,7 @@ export function JobDescriptionStep({ form }: JobDescriptionStepProps): React.Rea
   const { register, watch, setValue, formState: { errors } } = form;
 
   const [aiState, setAiState] = useState<AiState>('idle');
+  const [previewMode, setPreviewMode] = useState(false);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [enhancedDescription, setEnhancedDescription] = useState('');
 
@@ -101,19 +103,49 @@ export function JobDescriptionStep({ form }: JobDescriptionStepProps): React.Rea
   return (
     <div className="space-y-4">
       <div>
-        <label className="block text-lg font-semibold text-foreground mb-3">
-          Describe your project
-          <span className="text-red-500 ml-1">*</span>
-        </label>
-        <Textarea
-          {...register('content', {
-            required: 'Job description is required',
-          })}
-          rows={8}
-          placeholder="Describe your project, requirements, and expectations..."
-          className={`text-base ${errors.content ? 'border-destructive' : ''}`}
-          disabled={aiState === 'preview'}
-        />
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-lg font-semibold text-foreground">
+            Describe your project
+            <span className="text-red-500 ml-1">*</span>
+          </label>
+          <div className="flex items-center gap-1 rounded-md border border-border p-0.5 text-sm">
+            <button
+              type="button"
+              onClick={() => setPreviewMode(false)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded cursor-pointer transition-colors ${!previewMode ? 'bg-muted font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <FiEdit2 className="w-3.5 h-3.5" />
+              Write
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewMode(true)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded cursor-pointer transition-colors ${previewMode ? 'bg-muted font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <FiEye className="w-3.5 h-3.5" />
+              Preview
+            </button>
+          </div>
+        </div>
+
+        {previewMode ? (
+          <div className="min-h-[200px] rounded-md border border-border bg-muted/30 p-4">
+            {content?.trim()
+              ? <MarkdownContent content={content} />
+              : <p className="text-sm text-muted-foreground italic">Nothing to preview yet.</p>
+            }
+          </div>
+        ) : (
+          <Textarea
+            {...register('content', {
+              required: 'Job description is required',
+            })}
+            rows={8}
+            placeholder="Describe your project, requirements, and expectations..."
+            className={`text-base ${errors.content ? 'border-destructive' : ''}`}
+            disabled={aiState === 'preview'}
+          />
+        )}
         {errors.content && (
           <p className="mt-2 text-sm text-destructive">{errors.content.message}</p>
         )}
