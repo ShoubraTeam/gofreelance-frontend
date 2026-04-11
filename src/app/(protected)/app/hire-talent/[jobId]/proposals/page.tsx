@@ -6,8 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getJobProposals, getJobById } from '@/lib/api/jobs';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { FiArrowLeft, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiArrowLeft, FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { ProposalCard } from './_components/ProposalCard';
+import { MarkdownContent } from '@/components/MarkdownContent';
+import { Card, CardContent } from '@/components/ui/card';
 
 const PAGE_SIZE = 10;
 
@@ -15,6 +17,7 @@ export default function JobProposalsPage() {
   const { jobId } = useParams<{ jobId: string }>();
   const router = useRouter();
   const [page, setPage] = useState(0);
+  const [descExpanded, setDescExpanded] = useState(false);
 
   const { data: jobData } = useQuery({
     queryKey: ['job', jobId],
@@ -46,7 +49,7 @@ export default function JobProposalsPage() {
           </Button>
 
           <h1 className="text-2xl font-bold text-foreground">
-            {job ? `Proposals for "${job.title}"` : 'Proposals'}
+            {job?.title ?? 'Job Details'}
           </h1>
           {!isLoading && (
             <p className="mt-1 text-sm text-muted-foreground">
@@ -54,6 +57,31 @@ export default function JobProposalsPage() {
             </p>
           )}
         </div>
+
+        {job?.content && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left cursor-pointer"
+                onClick={() => setDescExpanded((v) => !v)}
+              >
+                <span className="text-base font-semibold">Job Description</span>
+                {descExpanded
+                  ? <FiChevronUp className="w-4 h-4 text-muted-foreground" />
+                  : <FiChevronDown className="w-4 h-4 text-muted-foreground" />
+                }
+              </button>
+              {descExpanded && (
+                <div className="mt-4">
+                  <MarkdownContent content={job.content} />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <h2 className="text-lg font-semibold mb-4">Proposals</h2>
 
         {isLoading && (
           <div className="flex items-center justify-center py-20">
