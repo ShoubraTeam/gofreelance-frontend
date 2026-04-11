@@ -1,4 +1,5 @@
 import { FiFileText } from 'react-icons/fi';
+import { MarkdownContent } from '@/components/MarkdownContent';
 
 interface JobDescriptionProps {
   content: string;
@@ -11,7 +12,7 @@ export function JobDescription({ content }: JobDescriptionProps) {
         <FiFileText className="w-5 h-5 text-primary" />
         Job Description
       </h2>
-      <p className="text-muted-foreground whitespace-pre-wrap">{content}</p>
+      <MarkdownContent content={content} />
     </div>
   );
 }
