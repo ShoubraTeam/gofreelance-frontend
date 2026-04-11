@@ -69,7 +69,7 @@ export async function getFreelancerProfileDetails(
   profileId: string
 ): Promise<ApiResponse<GetFreelancerProfileDetailsResponse>> {
   return apiClient.get<ApiResponse<GetFreelancerProfileDetailsResponse>>(
-    `/profiles/freelancer/${profileId}`,
+    `/profiles/freelancer/${profileId}/public`,
     { requiresAuth: true }
   );
 }
@@ -78,7 +78,7 @@ export async function getClientProfileDetails(
   profileId: string
 ): Promise<ApiResponse<GetClientProfileDetailsResponse>> {
   return apiClient.get<ApiResponse<GetClientProfileDetailsResponse>>(
-    `/profiles/client/${profileId}`,
+    `/profiles/client/${profileId}/public`,
     { requiresAuth: true }
   );
 }
