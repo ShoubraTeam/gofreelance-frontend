@@ -1,12 +1,19 @@
 'use client';
 
+import { useState, useRef, KeyboardEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FiDollarSign, FiUsers, FiCalendar, FiPlus } from 'react-icons/fi';
+import { Input } from '@/components/ui/input';
+import { FiDollarSign, FiUsers, FiCalendar, FiPlus, FiX } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 import type { JobResponse } from '@/lib/types/job';
+import { addJobTags, removeJobTags } from '@/lib/api/jobs';
 import { capitalize } from '@/lib/utils';
+
+const TAG_REGEX = /^[a-zA-Z0-9_]+$/;
 
 interface JobCardProps {
   job: JobResponse;
@@ -15,6 +22,57 @@ interface JobCardProps {
 
 function JobCard({ job, onEditJob }: JobCardProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [tags, setTags] = useState<string[]>(job.tags ?? []);
+  const [addingTag, setAddingTag] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const isOpen = job.jobStatus === 'OPEN';
+
+  const { mutate: addTags, isPending: isAdding } = useMutation({
+    mutationFn: (newTags: string[]) => addJobTags(job.id, newTags),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['client-jobs'] }),
+    onError: () => {
+      toast.error('Failed to add tags');
+      setTags(job.tags ?? []);
+    },
+  });
+
+  const { mutate: removeTags } = useMutation({
+    mutationFn: (removed: string[]) => removeJobTags(job.id, removed),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['client-jobs'] }),
+    onError: () => {
+      toast.error('Failed to remove tags');
+      setTags(job.tags ?? []);
+    },
+  });
+
+  const handleRemove = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+    removeTags([tag]);
+  };
+
+  const commitInput = () => {
+    const value = inputValue.trim();
+    if (!value) { setAddingTag(false); return; }
+    if (!TAG_REGEX.test(value)) { toast.error('Invalid tag: only letters, numbers, underscores'); return; }
+    if (tags.includes(value)) { setInputValue(''); setAddingTag(false); return; }
+    setTags((prev) => [...prev, value]);
+    addTags([value]);
+    setInputValue('');
+    setAddingTag(false);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',' || e.key === ' ') { e.preventDefault(); commitInput(); }
+    if (e.key === 'Escape') { setInputValue(''); setAddingTag(false); }
+  };
+
+  const handleShowInput = () => {
+    setAddingTag(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -37,15 +95,46 @@ function JobCard({ job, onEditJob }: JobCardProps) {
               {job.content}
             </p>
 
-            {job.tags && job.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {job.tags.map((tag) => (
-                  <Badge key={tag} variant="default" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="default" className="text-sm px-3 py-1 flex items-center gap-1 pr-2">
+                  {tag}
+                  {isOpen && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(tag)}
+                      className="ml-0.5 hover:text-primary-foreground/60 transition-colors cursor-pointer"
+                      aria-label={`Remove ${tag}`}
+                    >
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  )}
+                </Badge>
+              ))}
+              {isOpen && (
+                addingTag ? (
+                  <Input
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onBlur={commitInput}
+                    placeholder="tag name"
+                    disabled={isAdding}
+                    className="h-6 w-28 text-xs px-2 py-0"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleShowInput}
+                    className="flex items-center justify-center w-6 h-6 rounded-full border border-dashed border-muted-foreground/50 text-muted-foreground hover:border-primary hover:text-primary transition-colors cursor-pointer"
+                    aria-label="Add tag"
+                  >
+                    <FiPlus className="w-3 h-3" />
+                  </button>
+                )
+              )}
+            </div>
 
             <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex items-center gap-2">
