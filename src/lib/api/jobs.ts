@@ -32,10 +32,11 @@ export async function getClientJobs(
 }
 
 export async function updateJob(
+  id: string,
   data: UpdateJobRequest
 ): Promise<ApiResponse<string>> {
   return apiClient.patch<ApiResponse<string>, UpdateJobRequest>(
-    '/jobs',
+    `/jobs/${id}`,
     data,
     { requiresAuth: true }
   );
@@ -97,6 +98,29 @@ export async function enhanceDescription(
   return apiClient.post<ApiResponse<EnhanceDescriptionResponse>, EnhanceDescriptionRequest>(
     '/jobs/suggestions/enhance-description',
     data,
+    { requiresAuth: true }
+  );
+}
+
+export async function addJobTags(
+  jobId: string,
+  tags: string[]
+): Promise<ApiResponse<void>> {
+  return apiClient.post<ApiResponse<void>, { tags: string[] }>(
+    `/jobs/${jobId}/tags`,
+    { tags },
+    { requiresAuth: true }
+  );
+}
+
+export async function removeJobTags(
+  jobId: string,
+  tags: string[]
+): Promise<ApiResponse<void>> {
+  return apiClient.request<ApiResponse<void>, { tags: string[] }>(
+    'DELETE',
+    `/jobs/${jobId}/tags`,
+    { tags },
     { requiresAuth: true }
   );
 }

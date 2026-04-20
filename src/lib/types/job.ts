@@ -17,6 +17,7 @@ export interface NewJobRequest {
   jobPrice?: number;
   experienceLevel: ExperienceLevel;
   jobType: JobType;
+  tags?: string[];
 }
 
 export interface JobResponse {
@@ -29,10 +30,10 @@ export interface JobResponse {
   createdAt: string;
   jobStatus: JobStatus;
   proposalCount: number;
+  tags: string[];
 }
 
 export interface UpdateJobRequest {
-  id: string;
   jobPrice: number;
   experienceLevel: ExperienceLevel;
 }
