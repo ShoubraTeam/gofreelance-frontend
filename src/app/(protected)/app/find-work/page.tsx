@@ -41,7 +41,7 @@ export default function FindWorkPage() {
     description: job.content,
     budget: job.jobPrice,
     budgetType: 'fixed' as const,
-    skills: [],
+    skills: (job.tags ?? []).slice(0, 4),
     postedAt: new Date(job.createdAt).toLocaleDateString(),
     proposals: job.proposalCount,
   }));
