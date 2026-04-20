@@ -9,6 +9,7 @@ import {
 import type { UseFormReturn } from 'react-hook-form';
 import type { NewJobRequest, ExperienceLevel } from '@/lib/types/job';
 import { EXPERIENCE_LEVEL_OPTIONS } from '@/lib/types/job';
+import { TagInput } from './TagInput';
 
 interface JobBudgetStepProps {
   form: UseFormReturn<NewJobRequest>;
@@ -17,6 +18,7 @@ interface JobBudgetStepProps {
 export function JobBudgetStep({ form }: JobBudgetStepProps): React.ReactElement {
   const { register, watch, setValue, formState: { errors } } = form;
   const experienceLevel = watch('experienceLevel');
+  const tags = watch('tags') ?? [];
 
   return (
     <div className="space-y-6">
@@ -67,6 +69,18 @@ export function JobBudgetStep({ form }: JobBudgetStepProps): React.ReactElement 
         <p className="mt-2 text-sm text-muted-foreground">
           Select the minimum experience level for this job
         </p>
+      </div>
+
+      <div>
+        <label className="block text-lg font-semibold text-foreground mb-3">
+          Tags
+          <span className="ml-2 text-sm font-normal text-muted-foreground">(optional)</span>
+        </label>
+        <TagInput
+          tags={tags}
+          onChange={(newTags) => setValue('tags', newTags)}
+          placeholder="e.g. react, typescript, remote_ok"
+        />
       </div>
     </div>
   );
