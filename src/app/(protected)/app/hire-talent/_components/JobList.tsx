@@ -33,9 +33,19 @@ function JobCard({ job, onEditJob }: JobCardProps) {
               </Badge>
             </div>
 
-            <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+            <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
               {job.content}
             </p>
+
+            {job.tags && job.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {job.tags.map((tag) => (
+                  <Badge key={tag} variant="default" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex items-center gap-2">

@@ -7,7 +7,7 @@ import { createJob, getClientJobs, updateJob } from '@/lib/api/jobs';
 import { getProfiles } from '@/lib/api/profile';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { NewJobRequest, ExperienceLevel, JobResponse } from '@/lib/types/job';
+import type { NewJobRequest, ExperienceLevel, JobResponse, UpdateJobRequest } from '@/lib/types/job';
 import { useForm } from 'react-hook-form';
 import { QuickActionCards } from './_components/QuickActionCards';
 import { JobCreationForm } from './_components/JobCreationForm';
@@ -74,7 +74,7 @@ export default function HireTalentPage() {
   });
 
   const { mutate: updateJobMutation, isPending: isUpdating } = useMutation({
-    mutationFn: updateJob,
+    mutationFn: ({ id, ...data }: { id: string } & UpdateJobRequest) => updateJob(id, data),
     onSuccess: () => {
       toast.success('Job updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['client-jobs'] });
