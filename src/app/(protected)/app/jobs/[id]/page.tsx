@@ -184,6 +184,7 @@ export default function JobDetailsPage() {
               experienceLevel={job.experienceLevel}
               createdAt={job.createdAt}
               proposalCount={job.proposalCount}
+              tags={job.tags}
             />
 
             <Separator className="my-6" />

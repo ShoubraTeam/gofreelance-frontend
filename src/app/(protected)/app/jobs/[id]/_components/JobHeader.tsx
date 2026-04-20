@@ -9,6 +9,7 @@ interface JobHeaderProps {
   experienceLevel: string;
   createdAt: string;
   proposalCount: number;
+  tags?: string[];
 }
 
 export function JobHeader({
@@ -18,6 +19,7 @@ export function JobHeader({
   experienceLevel,
   createdAt,
   proposalCount,
+  tags,
 }: JobHeaderProps) {
   return (
     <div className="mb-6">
@@ -36,6 +38,16 @@ export function JobHeader({
           </div>
         </div>
       </div>
+
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tags.map((tag) => (
+            <Badge key={tag} variant="default" className="text-sm">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-6 text-sm">
         <div className="flex items-center gap-2">
