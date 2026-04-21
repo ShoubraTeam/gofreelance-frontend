@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getPublicJobs } from '@/lib/api/jobs';
+import { getJobs } from '@/lib/api/jobs';
 import { MentorshipCard } from './MentorshipCard';
 import {
   Pagination,
@@ -21,7 +21,7 @@ export function BrowseMentorships() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['public-mentorships', page],
-    queryFn: () => getPublicJobs(page, 'MENTORSHIP'),
+    queryFn: () => getJobs(page, 'MENTORSHIP'),
   });
 
   const pagedData = data?.data;

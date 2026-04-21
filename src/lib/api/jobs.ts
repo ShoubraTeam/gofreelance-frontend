@@ -42,7 +42,7 @@ export async function updateJob(
   );
 }
 
-export async function getPublicJobs(page = 0, jobType?: 'JOB' | 'MENTORSHIP'): Promise<ApiResponse<JobsPage>> {
+export async function getJobs(page = 0, jobType?: 'JOB' | 'MENTORSHIP'): Promise<ApiResponse<JobsPage>> {
   const params = new URLSearchParams({
     'page': page.toString(),
     'size': '10',
@@ -50,8 +50,8 @@ export async function getPublicJobs(page = 0, jobType?: 'JOB' | 'MENTORSHIP'): P
   if (jobType) params.set('jobType', jobType);
 
   return apiClient.get<ApiResponse<JobsPage>>(
-    `/jobs/public?${params.toString()}`,
-    { requiresAuth: false }
+    `/jobs?${params.toString()}`,
+    { requiresAuth: true }
   );
 }
 

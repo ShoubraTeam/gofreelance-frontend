@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getPublicJobs } from '@/lib/api/jobs';
+import { getJobs } from '@/lib/api/jobs';
 import { JobCard } from './_components/JobCard';
 import { SearchFilters } from './_components/SearchFilters';
 import { FindWorkHero } from './_components/FindWorkHero';
@@ -25,7 +25,7 @@ export default function FindWorkPage() {
 
   const { data: jobsData, isLoading } = useQuery({
     queryKey: ['public-jobs', currentPage],
-    queryFn: () => getPublicJobs(currentPage, 'JOB'),
+    queryFn: () => getJobs(currentPage, 'JOB'),
   });
 
   const pagedData = jobsData?.data;
