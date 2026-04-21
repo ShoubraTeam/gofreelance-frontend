@@ -40,7 +40,7 @@ export function ToolChipsEditor({ tools, onChange }: ToolChipsEditorProps) {
         {tools.map((tool) => (
           <Badge
             key={tool}
-            variant="secondary"
+            variant="default"
             className="flex items-center gap-1 px-2 py-1 text-sm"
           >
             {tool}
