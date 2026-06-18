@@ -21,6 +21,16 @@ export class ApiValidationError extends Error {
   }
 }
 
+export class ApiError extends Error {
+  public code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+  }
+}
+
 class ApiClient {
   private baseUrl: string;
   private isRefreshing = false;
@@ -92,6 +102,7 @@ class ApiClient {
       }))) as {
         message?: string;
         error?: string;
+        code?: string;
         validationErrors?: Array<{ field: string; message: string }>;
       };
 
@@ -102,10 +113,11 @@ class ApiClient {
         );
       }
 
-      throw new Error(
+      throw new ApiError(
         errorData.error ||
           errorData.message ||
-          `Request failed with status ${response.status}`
+          `Request failed with status ${response.status}`,
+        errorData.code
       );
     }
 
@@ -120,11 +132,16 @@ class ApiClient {
   ): Promise<TResponse> {
     const { requiresAuth = false, ...fetchOptions } = options;
 
+    const isFormData = data instanceof FormData;
+
     const makeRequest = async (): Promise<Response> => {
+      const headers = this.getHeaders(requiresAuth);
+      if (isFormData) delete headers['Content-Type'];
+
       return fetch(`${this.baseUrl}${endpoint}`, {
         method,
-        headers: this.getHeaders(requiresAuth),
-        body: data ? JSON.stringify(data) : undefined,
+        headers,
+        body: isFormData ? (data as FormData) : data ? JSON.stringify(data) : undefined,
         ...fetchOptions,
       });
     };

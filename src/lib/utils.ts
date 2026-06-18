@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import toast from 'react-hot-toast';
 import { UserType } from './types/auth';
+import { ApiError } from './api/client';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,6 +22,11 @@ export function getHomeRoute(currentType: UserType): string {
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message) return error.message;
   return fallback;
+}
+
+export function getApiErrorCode(error: unknown): string | undefined {
+  if (error instanceof ApiError) return error.code;
+  return undefined;
 }
 
 export function createSaveHandlers(
