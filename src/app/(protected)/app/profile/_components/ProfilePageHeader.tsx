@@ -1,6 +1,9 @@
 'use client';
 
+import { useRef } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import type { AccountInfo } from '@/lib/types/auth';
 import { UserType } from '@/lib/types/auth';
 import {
@@ -9,11 +12,18 @@ import {
   FiMapPin,
   FiSettings,
   FiEye,
+  FiCamera,
+  FiTrash2,
 } from 'react-icons/fi';
-import { capitalize } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
+import { capitalize, getApiErrorCode } from '@/lib/utils';
+import { uploadProfilePhoto, deleteProfilePhoto } from '@/lib/api/auth';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+
+const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024;
 
 interface ProfilePageHeaderProps {
   account: AccountInfo;
@@ -22,7 +32,59 @@ interface ProfilePageHeaderProps {
 
 export function ProfilePageHeader({ account, selectedProfileId }: ProfilePageHeaderProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { mutate: uploadPhoto, isPending: isUploadingPhoto } = useMutation({
+    mutationFn: uploadProfilePhoto,
+    onSuccess: (response) => {
+      toast.success('Profile photo updated');
+      if (user) setUser({ ...user, personalPhoto: response.data.personalPhoto ?? '' });
+      queryClient.invalidateQueries({ queryKey: ['account', 'info'] });
+    },
+    onError: (error: unknown) => {
+      const code = getApiErrorCode(error);
+      if (code === 'ERR_UNSUPPORTED_FILE_TYPE') {
+        toast.error('Unsupported file type. Use JPEG, PNG, GIF, or WEBP.');
+      } else if (code === 'ERR_FILE_TOO_LARGE') {
+        toast.error('Photo is too large. Max size is 5MB.');
+      } else {
+        toast.error('Failed to upload photo, try again.');
+      }
+    },
+  });
+
+  const { mutate: removePhoto, isPending: isRemovingPhoto } = useMutation({
+    mutationFn: deleteProfilePhoto,
+    onSuccess: (response) => {
+      toast.success('Profile photo removed');
+      if (user) setUser({ ...user, personalPhoto: response.data.personalPhoto ?? '' });
+      queryClient.invalidateQueries({ queryKey: ['account', 'info'] });
+    },
+    onError: () => {
+      toast.error('Failed to remove photo, try again.');
+    },
+  });
+
+  const isPhotoPending = isUploadingPhoto || isRemovingPhoto;
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    if (!ACCEPTED_PHOTO_TYPES.includes(file.type)) {
+      toast.error('Unsupported file type. Use JPEG, PNG, GIF, or WEBP.');
+      return;
+    }
+    if (file.size > MAX_PHOTO_SIZE_BYTES) {
+      toast.error('Photo is too large. Max size is 5MB.');
+      return;
+    }
+
+    uploadPhoto(file);
+  };
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -83,14 +145,58 @@ export function ProfilePageHeader({ account, selectedProfileId }: ProfilePageHea
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 w-full sm:w-auto">
             <div className="relative group shrink-0">
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl sm:text-3xl md:text-4xl shadow-lg ring-4 ring-white">
-                {account.firstName?.[0]}
-                {account.lastName?.[0]}
-              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_PHOTO_TYPES.join(',')}
+                className="hidden"
+                onChange={handlePhotoSelect}
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPhotoPending}
+                className="relative block w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full shadow-lg ring-4 ring-white disabled:cursor-not-allowed"
+              >
+                <Avatar className="w-full h-full">
+                  <AvatarImage src={account.personalPhoto} alt={account.firstName} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white font-bold text-2xl sm:text-3xl md:text-4xl">
+                    {account.firstName?.[0]}
+                    {account.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                  {isUploadingPhoto ? (
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  ) : (
+                    <FiCamera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
+              </button>
+
               {account.emailVerified && (
                 <div className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-gradient-to-br from-green-400 to-green-600 rounded-full border-3 sm:border-4 border-white flex items-center justify-center shadow-lg">
                   <FiCheckCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" />
                 </div>
+              )}
+
+              {account.personalPhoto && (
+                <button
+                  type="button"
+                  onClick={() => removePhoto()}
+                  disabled={isPhotoPending}
+                  title="Remove photo"
+                  className="absolute -top-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 bg-white border border-border rounded-full flex items-center justify-center shadow-lg hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-colors disabled:cursor-not-allowed"
+                >
+                  {isRemovingPhoto ? (
+                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                  ) : (
+                    <FiTrash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  )}
+                </button>
               )}
             </div>
 

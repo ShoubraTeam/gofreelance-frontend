@@ -7,6 +7,7 @@ import { useSwitchAccount, useCreateAccount } from '@/hooks/useAuth';
 import { getHomeRoute } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { HiBriefcase, HiUserGroup, HiUser, HiLogout, HiPlus } from 'react-icons/hi';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,9 +63,14 @@ export function UserMenu() {
     <div className="flex items-center space-x-3 border-l border-gray-200 pl-4">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-semibold text-sm ring-2 ring-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
-            {user?.firstName?.[0]}
-            {user?.lastName?.[0]}
+          <button className="w-10 h-10 rounded-full ring-2 ring-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+            <Avatar className="w-full h-full">
+              <AvatarImage src={user?.personalPhoto} alt={user?.firstName} />
+              <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-primary-foreground font-semibold text-sm">
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
+              </AvatarFallback>
+            </Avatar>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">

@@ -69,3 +69,21 @@ export async function createFreelancerAccount(): Promise<ApiResponse<void>> {
     requiresAuth: true,
   });
 }
+
+export async function uploadProfilePhoto(
+  file: File
+): Promise<ApiResponse<AccountInfo>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return apiClient.patch<ApiResponse<AccountInfo>, FormData>(
+    '/me/photo',
+    formData,
+    { requiresAuth: true }
+  );
+}
+
+export async function deleteProfilePhoto(): Promise<ApiResponse<AccountInfo>> {
+  return apiClient.delete<ApiResponse<AccountInfo>>('/me/photo', {
+    requiresAuth: true,
+  });
+}
