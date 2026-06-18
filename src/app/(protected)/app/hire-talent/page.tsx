@@ -7,6 +7,7 @@ import { createJob, getClientJobs, updateJob } from '@/lib/api/jobs';
 import { getProfiles } from '@/lib/api/profile';
 import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiErrorCode } from '@/lib/utils';
 import type { NewJobRequest, ExperienceLevel, JobResponse, UpdateJobRequest } from '@/lib/types/job';
 import { useForm } from 'react-hook-form';
 import { QuickActionCards } from './_components/QuickActionCards';
@@ -68,8 +69,12 @@ export default function HireTalentPage() {
       setCurrentStep(1);
       reset();
     },
-    onError: () => {
-      toast.error('Failed to create job');
+    onError: (error: unknown) => {
+      if (getApiErrorCode(error) === 'ERR_RECOMMENDATION_SERVICE_ERROR') {
+        toast.error("AI couldn't process this job right now, please try again.");
+      } else {
+        toast.error('Failed to create job');
+      }
     },
   });
 
@@ -80,8 +85,12 @@ export default function HireTalentPage() {
       queryClient.invalidateQueries({ queryKey: ['client-jobs'] });
       setEditingJob(null);
     },
-    onError: () => {
-      toast.error('Failed to update job');
+    onError: (error: unknown) => {
+      if (getApiErrorCode(error) === 'ERR_RECOMMENDATION_SERVICE_ERROR') {
+        toast.error("AI couldn't process this job right now, please try again.");
+      } else {
+        toast.error('Failed to update job');
+      }
     },
   });
 
