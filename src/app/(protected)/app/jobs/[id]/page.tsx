@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { getApiErrorMessage } from '@/lib/utils';
 import { getJobById } from '@/lib/api/jobs';
 import { createProposal, getMyProposals, editProposal, deleteProposal } from '@/lib/api/proposals';
-import { getProfiles } from '@/lib/api/profile';
+import { getProfiles, getFreelancerProfileDetails } from '@/lib/api/profile';
 import type { ProposalResponse, EditProposalRequest } from '@/lib/types/proposal';
 import { JobHeader } from './_components/JobHeader';
 import { JobDescription } from './_components/JobDescription';
@@ -24,6 +24,7 @@ export default function JobDetailsPage() {
   const [proposalPrice, setProposalPrice] = useState('');
   const [proposalHours, setProposalHours] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [useHourlyRateForPrice, setUseHourlyRateForPrice] = useState(false);
 
   const { data: jobData, isLoading } = useQuery({
     queryKey: ['job', jobId],
@@ -44,6 +45,14 @@ export default function JobDetailsPage() {
     (p) => p.profileType === 'FREELANCER'
   );
 
+  const { data: freelancerDetailsData } = useQuery({
+    queryKey: ['profile-details', freelancerProfile?.id, 'freelancer'],
+    queryFn: () => getFreelancerProfileDetails(freelancerProfile!.id),
+    enabled: !!freelancerProfile,
+  });
+
+  const hourlyRate = freelancerDetailsData?.data?.hourlyRate;
+
   const existingProposal = proposalsData?.data?.find(
     (p: ProposalResponse) => p.jobId === jobId
   );
@@ -55,6 +64,7 @@ export default function JobDetailsPage() {
       setProposalContent('');
       setProposalPrice('');
       setProposalHours('');
+      setUseHourlyRateForPrice(false);
       queryClient.invalidateQueries({ queryKey: ['my-proposals'] });
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });
     },
@@ -130,6 +140,20 @@ export default function JobDetailsPage() {
     }
   };
 
+  const handleHoursChange = (value: string) => {
+    setProposalHours(value);
+    if (useHourlyRateForPrice && hourlyRate) {
+      setProposalPrice(value ? (Number(value) * hourlyRate).toString() : '');
+    }
+  };
+
+  const handleToggleUseHourlyRate = (checked: boolean) => {
+    setUseHourlyRateForPrice(checked);
+    if (checked && hourlyRate && proposalHours) {
+      setProposalPrice((Number(proposalHours) * hourlyRate).toString());
+    }
+  };
+
   const handleEditClick = () => {
     if (existingProposal) {
       setProposalContent(existingProposal.content);
@@ -143,6 +167,7 @@ export default function JobDetailsPage() {
     setProposalContent('');
     setProposalPrice('');
     setProposalHours('');
+    setUseHourlyRateForPrice(false);
     setIsEditMode(false);
   };
 
@@ -200,11 +225,14 @@ export default function JobDetailsPage() {
               proposalPrice={proposalPrice}
               proposalHours={proposalHours}
               jobPrice={job.jobPrice}
+              hourlyRate={hourlyRate}
+              useHourlyRateForPrice={useHourlyRateForPrice}
               isDeleting={isDeleting}
               isPending={isPending}
               onContentChange={setProposalContent}
               onPriceChange={setProposalPrice}
-              onHoursChange={setProposalHours}
+              onHoursChange={handleHoursChange}
+              onToggleUseHourlyRate={handleToggleUseHourlyRate}
               onSubmit={handleSubmitProposal}
               onEdit={handleEditClick}
               onCancel={handleCancelEdit}

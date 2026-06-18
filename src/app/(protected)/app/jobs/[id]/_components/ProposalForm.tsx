@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2 } from 'lucide-react';
 
 interface ProposalFormProps {
@@ -8,11 +9,14 @@ interface ProposalFormProps {
   proposalPrice: string;
   proposalHours: string;
   jobPrice: number;
+  hourlyRate: number | undefined;
+  useHourlyRateForPrice: boolean;
   isEditMode: boolean;
   isPending: boolean;
   onContentChange: (value: string) => void;
   onPriceChange: (value: string) => void;
   onHoursChange: (value: string) => void;
+  onToggleUseHourlyRate: (checked: boolean) => void;
   onSubmit: () => void;
   onCancel?: () => void;
 }
@@ -22,11 +26,14 @@ export function ProposalForm({
   proposalPrice,
   proposalHours,
   jobPrice,
+  hourlyRate,
+  useHourlyRateForPrice,
   isEditMode,
   isPending,
   onContentChange,
   onPriceChange,
   onHoursChange,
+  onToggleUseHourlyRate,
   onSubmit,
   onCancel,
 }: ProposalFormProps) {
@@ -65,6 +72,19 @@ export function ProposalForm({
           <p className="text-xs text-muted-foreground mt-1">
             Client&apos;s budget: ${jobPrice.toLocaleString()}
           </p>
+          {hourlyRate != null ? (
+            <label className="flex items-center gap-2 mt-2 text-xs text-muted-foreground cursor-pointer">
+              <Checkbox
+                checked={useHourlyRateForPrice}
+                onCheckedChange={(checked) => onToggleUseHourlyRate(checked === true)}
+              />
+              Use my hourly rate (${hourlyRate}/hr × hours)
+            </label>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-2">
+              Set your hourly rate in your profile to auto-fill bids by hours.
+            </p>
+          )}
         </div>
 
         <div>

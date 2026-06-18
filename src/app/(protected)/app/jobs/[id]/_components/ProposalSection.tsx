@@ -11,11 +11,14 @@ interface ProposalSectionProps {
   proposalPrice: string;
   proposalHours: string;
   jobPrice: number;
+  hourlyRate: number | undefined;
+  useHourlyRateForPrice: boolean;
   isDeleting: boolean;
   isPending: boolean;
   onContentChange: (value: string) => void;
   onPriceChange: (value: string) => void;
   onHoursChange: (value: string) => void;
+  onToggleUseHourlyRate: (checked: boolean) => void;
   onSubmit: () => void;
   onEdit: () => void;
   onCancel: () => void;
@@ -29,11 +32,14 @@ export function ProposalSection({
   proposalPrice,
   proposalHours,
   jobPrice,
+  hourlyRate,
+  useHourlyRateForPrice,
   isDeleting,
   isPending,
   onContentChange,
   onPriceChange,
   onHoursChange,
+  onToggleUseHourlyRate,
   onSubmit,
   onEdit,
   onCancel,
@@ -86,11 +92,14 @@ export function ProposalSection({
           proposalPrice={proposalPrice}
           proposalHours={proposalHours}
           jobPrice={jobPrice}
+          hourlyRate={hourlyRate}
+          useHourlyRateForPrice={useHourlyRateForPrice}
           isEditMode={isEditMode}
           isPending={isPending}
           onContentChange={onContentChange}
           onPriceChange={onPriceChange}
           onHoursChange={onHoursChange}
+          onToggleUseHourlyRate={onToggleUseHourlyRate}
           onSubmit={onSubmit}
           onCancel={isEditMode ? onCancel : undefined}
         />
