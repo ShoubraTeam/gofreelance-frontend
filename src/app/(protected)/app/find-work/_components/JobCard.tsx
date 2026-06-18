@@ -7,6 +7,7 @@ interface Job {
   budget: number;
   budgetType: 'fixed' | 'hourly';
   skills: string[];
+  hasMoreSkills: boolean;
   postedAt: string;
   proposals: number;
 }
@@ -82,6 +83,14 @@ export function JobCard({ job }: JobCardProps) {
             {skill}
           </span>
         ))}
+        {job.hasMoreSkills && (
+          <span
+            className="px-2 py-1 text-muted-foreground text-sm font-bold leading-none"
+            aria-label="More tags"
+          >
+            •••
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-end pt-4 border-t border-gray-200">
