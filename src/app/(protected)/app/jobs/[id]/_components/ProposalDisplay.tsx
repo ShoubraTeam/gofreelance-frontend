@@ -1,7 +1,7 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import type { ProposalResponse } from '@/lib/types/proposal';
+import { RejectionReasonButton } from '@/components/RejectionReasonButton';
 
 interface ProposalDisplayProps {
   proposal: ProposalResponse;
@@ -70,6 +70,9 @@ export function ProposalDisplay({
             'Withdraw Proposal'
           )}
         </Button>
+        {proposal.status === 'REJECTED' && (
+          <RejectionReasonButton proposalId={proposal.id} />
+        )}
       </div>
     </div>
   );

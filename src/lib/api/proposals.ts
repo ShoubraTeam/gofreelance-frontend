@@ -1,6 +1,11 @@
 import { apiClient } from './client';
 import type { ApiResponse } from '../types/api';
-import type { CreateProposalRequest, ProposalResponse, EditProposalRequest } from '../types/proposal';
+import type {
+  CreateProposalRequest,
+  ProposalResponse,
+  EditProposalRequest,
+  ProposalRejectionReasonResponse,
+} from '../types/proposal';
 
 export async function createProposal(
   data: CreateProposalRequest
@@ -40,6 +45,15 @@ export async function editProposal(
 export async function deleteProposal(proposalId: string): Promise<ApiResponse<void>> {
   return apiClient.delete<ApiResponse<void>>(
     `/proposals/${proposalId}`,
+    { requiresAuth: true }
+  );
+}
+
+export async function getProposalRejectionReason(
+  proposalId: string
+): Promise<ApiResponse<ProposalRejectionReasonResponse>> {
+  return apiClient.get<ApiResponse<ProposalRejectionReasonResponse>>(
+    `/proposals/${proposalId}/rejection-reason`,
     { requiresAuth: true }
   );
 }

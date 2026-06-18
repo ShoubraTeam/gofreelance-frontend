@@ -28,6 +28,10 @@ export interface EditProposalRequest {
   totalPrice?: number;
 }
 
+export interface ProposalRejectionReasonResponse {
+  report: string;
+}
+
 export interface ProposalsPage {
   content: ProposalResponse[];
   totalElements: number;
