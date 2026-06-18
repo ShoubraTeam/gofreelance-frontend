@@ -121,7 +121,6 @@ export default function RegisterPage(): React.ReactElement {
       birthDate: data.birthDate,
       country: data.country,
       timezone: data.timezone,
-      personalPhoto: data.personalPhoto,
       userType: selectedRole,
     });
   };

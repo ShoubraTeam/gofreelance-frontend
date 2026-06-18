@@ -8,7 +8,6 @@ import { GenderSelector } from './registration-fields/GenderSelector';
 import { BirthdateField } from './registration-fields/BirthdateField';
 import { CountrySelector } from './registration-fields/CountrySelector';
 import { TimezoneSelector } from './registration-fields/TimezoneSelector';
-import { PhotoUploadField } from './registration-fields/PhotoUploadField';
 import { FormNavigation } from './registration-fields/FormNavigation';
 
 interface RegistrationStepTwoProps {
@@ -66,8 +65,6 @@ export function RegistrationStepTwo({
         timezones={timezones}
         selectedCountry={selectedCountry}
       />
-
-      <PhotoUploadField form={form} isLoading={isLoading} />
 
       <FormNavigation isLoading={isLoading} onBack={onBack} />
     </>

@@ -39,7 +39,6 @@ export const registrationSchema = z
       .min(1, 'Country is required')
       .min(2, 'Country name must be at least 2 characters'),
     timezone: z.string().min(1, 'Timezone is required'),
-    personalPhoto: z.any().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
