@@ -9,6 +9,7 @@ import { getFreelancerProfileDetails, getClientProfileDetails } from '@/lib/api/
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserType } from '@/lib/types/auth';
 import { ProfileBioSection } from './sections/ProfileBioSection';
+import { ProfileScoreSection } from './sections/ProfileScoreSection';
 import { ProfileSkillsSection } from './sections/ProfileSkillsSection';
 import { ProfileWorkExperienceSection } from './sections/ProfileWorkExperienceSection';
 import { ProfilePortfolioSection } from './sections/ProfilePortfolioSection';
@@ -86,6 +87,7 @@ export function ProfileMainContent({
     return (
       <div className="space-y-4">
         <ProfileBioSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
+        <ProfileScoreSection profileId={freelancerProfile.id} />
         <ProfileSkillsSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
         <ProfileWorkExperienceSection profile={freelancerProfile} onUpdate={refetchFreelancer} />
         <ProfilePortfolioSection profile={freelancerProfile} onUpdate={refetchFreelancer} />

@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { createFreelancerProfile, getSpecializations } from '@/lib/api/profile';
+import { getApiErrorCode } from '@/lib/utils';
 import type { CreateFreelancerProfileRequest } from '@/lib/types/profile';
 import { ProfileFormHeader } from '../_components/ProfileFormHeader';
 import { TitleField } from '../_components/TitleField';
 import { SpecializationField } from '../_components/SpecializationField';
+import { HourlyRateField } from '../_components/HourlyRateField';
 import { BioField } from '../_components/BioField';
 import { FormError } from '../_components/FormError';
 import { SubmitButton } from '../_components/SubmitButton';
@@ -102,6 +104,8 @@ export default function CreateFreelancerProfilePage() {
               specializations={specializations}
             />
 
+            <HourlyRateField register={register} errors={errors} />
+
             <BioField
               register={register}
               errors={errors}
@@ -109,7 +113,14 @@ export default function CreateFreelancerProfilePage() {
               placeholder="Tell us about your skills, experience, and what kind of projects you're looking for..."
             />
 
-            <FormError show={!!createProfileMutation.error} />
+            <FormError
+              show={!!createProfileMutation.error}
+              message={
+                getApiErrorCode(createProfileMutation.error) === 'ERR_RECOMMENDATION_SERVICE_ERROR'
+                  ? "AI couldn't process this profile right now, please try again."
+                  : undefined
+              }
+            />
 
             <SubmitButton
               isPending={createProfileMutation.isPending}

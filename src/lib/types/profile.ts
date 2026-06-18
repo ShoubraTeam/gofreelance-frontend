@@ -21,6 +21,7 @@ export interface CreateFreelancerProfileRequest {
   title: string;
   bio: string;
   specializationId: string;
+  hourlyRate: number;
 }
 
 export interface EditClientProfileRequest {
@@ -33,6 +34,7 @@ export interface EditFreelancerProfileRequest {
   id: string;
   title?: string;
   bio?: string;
+  hourlyRate?: number;
 }
 
 export interface ProfileActionResponse {
@@ -90,6 +92,7 @@ export interface GetFreelancerProfileDetailsResponse {
   projects: ProjectDetail[];
   workExperiences: WorkExperienceDetail[];
   certificates: CertificateDetail[];
+  hourlyRate: number;
 }
 
 export interface GetClientProfileDetailsResponse {
@@ -127,4 +130,11 @@ export interface CertificateRequest {
   profileId: string;
   certificateName: string;
   certificateUrl?: string;
+}
+
+export interface ProfileScoreResponse {
+  numericalRes: unknown;
+  bioRes: unknown;
+  skillsRes: unknown;
+  report: string;
 }

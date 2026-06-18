@@ -65,6 +65,9 @@ export default function PublicProfilePage({ params }: PageProps) {
                   {freelancerDetails.averageRatings.toFixed(1)}
                 </span>
                 <span>({freelancerDetails.numberOfRatings} reviews)</span>
+                <span className="text-foreground font-semibold ml-2">
+                  ${freelancerDetails.hourlyRate}/hr
+                </span>
               </div>
 
               {freelancerDetails?.specialization && (

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { GetFreelancerProfileDetailsResponse, GetClientProfileDetailsResponse } from '@/lib/types/profile';
 import { editFreelancerProfile, editClientProfile } from '@/lib/api/profile';
+import { getApiErrorCode } from '@/lib/utils';
 import { FiEdit2, FiSave, FiX } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -24,6 +25,9 @@ export function ProfileBioSection({
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(displayTitle);
   const [bio, setBio] = useState(profile.bio);
+  const [hourlyRate, setHourlyRate] = useState(
+    isFreelancer ? (profile as GetFreelancerProfileDetailsResponse).hourlyRate.toString() : ''
+  );
 
   const { mutate: saveFreelancerProfile, isPending: isFreelancerPending } = useMutation({
     mutationFn: editFreelancerProfile,
@@ -32,8 +36,12 @@ export function ProfileBioSection({
       setIsEditing(false);
       onUpdate();
     },
-    onError: () => {
-      toast.error('Failed to update profile');
+    onError: (error: unknown) => {
+      if (getApiErrorCode(error) === 'ERR_RECOMMENDATION_SERVICE_ERROR') {
+        toast.error("AI couldn't process this update right now, please try again.");
+      } else {
+        toast.error('Failed to update profile');
+      }
     },
   });
 
@@ -53,7 +61,7 @@ export function ProfileBioSection({
 
   const handleSave = () => {
     if (isFreelancer) {
-      saveFreelancerProfile({ id: profile.id, title, bio });
+      saveFreelancerProfile({ id: profile.id, title, bio, hourlyRate: Number(hourlyRate) });
     } else {
       saveClientProfile({ id: profile.id, companyName: title, bio });
     }
@@ -62,6 +70,9 @@ export function ProfileBioSection({
   const handleCancel = () => {
     setTitle(displayTitle);
     setBio(profile.bio);
+    if (isFreelancer) {
+      setHourlyRate((profile as GetFreelancerProfileDetailsResponse).hourlyRate.toString());
+    }
     setIsEditing(false);
   };
 
@@ -75,9 +86,16 @@ export function ProfileBioSection({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-start justify-between mb-3">
-              <h1 className="text-2xl font-bold text-foreground flex-1">
-                {displayTitle}
-              </h1>
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold text-foreground">
+                  {displayTitle}
+                </h1>
+                {isFreelancer && !isEditing && (
+                  <p className="text-sm text-primary font-semibold mt-1">
+                    ${(profile as GetFreelancerProfileDetailsResponse).hourlyRate}/hr
+                  </p>
+                )}
+              </div>
               {!isEditing && (
                 <Button
                   variant="ghost"
@@ -108,6 +126,22 @@ export function ProfileBioSection({
               </p>
             </div>
 
+            {isFreelancer && (
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">
+                  Hourly Rate ($)
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min={0.01}
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(e.target.value)}
+                  placeholder="e.g., 25"
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-semibold text-foreground mb-2">
                 Bio
@@ -127,7 +161,12 @@ export function ProfileBioSection({
             <div className="flex gap-2">
               <Button
                 onClick={handleSave}
-                disabled={isPending || title.length < 3 || bio.length < 3}
+                disabled={
+                  isPending ||
+                  title.length < 3 ||
+                  bio.length < 3 ||
+                  (isFreelancer && !(Number(hourlyRate) > 0))
+                }
                 size="sm"
               >
                 <FiSave className="w-4 h-4 mr-2" />

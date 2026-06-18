@@ -9,6 +9,7 @@ import type {
   SpecializationResponse,
   GetFreelancerProfileDetailsResponse,
   GetClientProfileDetailsResponse,
+  ProfileScoreResponse,
 } from '../types/profile';
 import type { ApiResponse } from '../types/api';
 
@@ -79,6 +80,16 @@ export async function getClientProfileDetails(
 ): Promise<ApiResponse<GetClientProfileDetailsResponse>> {
   return apiClient.get<ApiResponse<GetClientProfileDetailsResponse>>(
     `/profiles/client/${profileId}/public`,
+    { requiresAuth: true }
+  );
+}
+
+export async function scoreFreelancerProfile(
+  profileId: string
+): Promise<ApiResponse<ProfileScoreResponse>> {
+  return apiClient.post<ApiResponse<ProfileScoreResponse>>(
+    `/profiles/freelancer/${profileId}/score`,
+    undefined,
     { requiresAuth: true }
   );
 }
