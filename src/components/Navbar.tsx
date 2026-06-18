@@ -23,6 +23,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: homeHref, label: homeLabel },
+    ...(isFreelancer ? [{ href: '/app/my-proposals', label: 'My Proposals' }] : []),
     ...(isFreelancer ? [{ href: '/app/mentorships', label: 'Mentorships' }] : []),
     { href: '/app/contracts', label: 'My Contracts' },
     { href: '/app/messages', label: 'Messages' },
