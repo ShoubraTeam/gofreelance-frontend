@@ -16,12 +16,15 @@ import { EnhancedDescriptionPreview } from './EnhancedDescriptionPreview';
 
 type AiState = 'idle' | 'detecting' | 'tool-selection' | 'enhancing' | 'preview';
 
+const sanitizeTag = (raw: string): string =>
+  raw.trim().replace(/[^a-zA-Z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+
 interface JobDescriptionStepProps {
   form: UseFormReturn<NewJobRequest>;
 }
 
 export function JobDescriptionStep({ form }: JobDescriptionStepProps): React.ReactElement {
-  const { register, watch, setValue, formState: { errors } } = form;
+  const { register, watch, setValue, getValues, formState: { errors } } = form;
 
   const [aiState, setAiState] = useState<AiState>('idle');
   const [previewMode, setPreviewMode] = useState(false);
@@ -87,6 +90,15 @@ export function JobDescriptionStep({ form }: JobDescriptionStepProps): React.Rea
 
   const handleAccept = () => {
     setValue('content', enhancedDescription);
+
+    const existingTags = getValues('tags') ?? [];
+    const newTags = selectedTools
+      .map(sanitizeTag)
+      .filter((tag) => tag.length > 0 && !existingTags.includes(tag));
+    if (newTags.length > 0) {
+      setValue('tags', [...existingTags, ...newTags]);
+    }
+
     setAiState('idle');
     setEnhancedDescription('');
     setSelectedTools([]);
