@@ -6,10 +6,16 @@ interface IdentityVerificationRequest {
   image2Base64: string;
 }
 
+export interface IdentityVerificationResponse {
+  verified: boolean;
+  similarity: number;
+  similarityThreshold: number;
+}
+
 export async function submitIdentityVerification(
   data: IdentityVerificationRequest
-): Promise<ApiResponse<void>> {
-  return apiClient.post<ApiResponse<void>, IdentityVerificationRequest>(
+): Promise<ApiResponse<IdentityVerificationResponse>> {
+  return apiClient.post<ApiResponse<IdentityVerificationResponse>, IdentityVerificationRequest>(
     '/verification/identity',
     data,
     { requiresAuth: true }

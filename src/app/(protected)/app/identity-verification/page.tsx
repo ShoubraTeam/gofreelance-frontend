@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAccountInfo } from '@/lib/api/auth';
-import { submitIdentityVerification } from '@/lib/api/verification';
+import { submitIdentityVerification, type IdentityVerificationResponse } from '@/lib/api/verification';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,6 +15,8 @@ import { ImageUploadCard } from './_components/ImageUploadCard';
 export default function IdentityVerificationPage(): React.ReactElement {
   const [idImage, setIdImage] = useState<string | null>(null);
   const [selfieImage, setSelfieImage] = useState<string | null>(null);
+  const [verificationResult, setVerificationResult] =
+    useState<IdentityVerificationResponse | null>(null);
   const queryClient = useQueryClient();
 
   const {
@@ -28,8 +30,9 @@ export default function IdentityVerificationPage(): React.ReactElement {
 
   const mutation = useMutation({
     mutationFn: submitIdentityVerification,
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success('Verification submitted successfully. We will review your documents shortly.');
+      setVerificationResult(response.data);
       setIdImage(null);
       setSelfieImage(null);
       queryClient.invalidateQueries({ queryKey: ['account', 'info'] });
@@ -86,6 +89,21 @@ export default function IdentityVerificationPage(): React.ReactElement {
             <VerificationStatus status={status} />
           </div>
         </div>
+
+        {verificationResult && (
+          <Card className="mb-6">
+            <CardContent className="py-4">
+              <p className="text-sm text-muted-foreground mb-1">AI Match Score</p>
+              <p className="text-foreground">
+                Similarity:{' '}
+                <span className="font-semibold">
+                  {(verificationResult.similarity * 100).toFixed(0)}%
+                </span>{' '}
+                (required: {(verificationResult.similarityThreshold * 100).toFixed(0)}%)
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {status === 'VERIFIED' && (
           <Card>
